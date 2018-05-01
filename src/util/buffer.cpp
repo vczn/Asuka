@@ -1,7 +1,7 @@
 ﻿#include "buffer.hpp"
 
-#include <cassert>
 #include <algorithm>
+#include <cassert>
 #include <utility>
 
 #include "endian.hpp"
