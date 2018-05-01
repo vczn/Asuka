@@ -18,9 +18,9 @@ class Duration
 {
 public:
     static const std::int64_t kMillisecond = 1000L;
-    static const std::int64_t kSecond = 1000L * kMillisecond;
-    static const std::int64_t kMinute = 1000L * kSecond;
-    static const std::int64_t kHour = 60L * kMinute;
+    static const std::int64_t kSecond = 1000 * kMillisecond;
+    static const std::int64_t kMinute = 60 * kSecond;
+    static const std::int64_t kHour = 60 * kMinute;
 
 public:
     Duration() = default;

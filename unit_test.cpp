@@ -64,6 +64,12 @@ void test_block_queue()
     // TODO
 }
 
+void test_config()
+{
+#if 1
+#endif
+}
+
 void test_string_view()
 {
 
@@ -77,12 +83,9 @@ void test_time_stamp()
     TimeStamp ts2 = TimeStamp::now();
     UNIT_TEST(true, ts2.is_valid());
 #if 1
-    
     std::cout << ts2.to_string() << std::endl;
     std::cout << ts2.to_formatted_string() << std::endl;
     std::cout << ts2.to_formatted_string(false) << std::endl;
-    
-
 #endif
 }
 

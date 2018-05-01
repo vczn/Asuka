@@ -28,6 +28,26 @@ Config& Config::instance()
     return config;
 }
 
+short Config::get_port() const
+{
+    return any_cast<short>(mConfig[kPortIndex]);
+}
+
+int Config::get_threads() const
+{
+    return any_cast<int>(mConfig[kThreadsIndex]);
+}
+
+bool Config::get_use_epoll() const
+{
+    return any_cast<bool>(mConfig[kUseIndex]);
+}
+
+std::string Config::get_log_file() const
+{
+    return any_cast<std::string>(mConfig[kLogIndex]);
+}
+
 Config::Config()
 {
     std::ifstream fin{ kConfigFile };

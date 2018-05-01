@@ -32,12 +32,20 @@ public:
 public:
     static Config& instance();
 
+    short get_port() const;
+
+    int get_threads() const;
+
+    bool get_use_epoll() const;
+
+    std::string get_log_file() const;
 private:
     Config();
 
     void load_config(std::ifstream& fin);
     void parse_line(const std::string& line, std::size_t curLine);
     void load_default_config();
+
 private:
     // short port
     // int threads
