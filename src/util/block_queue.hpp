@@ -17,7 +17,7 @@ namespace Asuka
 
 // Thread queue
 template <typename T>
-class BlockQueue
+class BlockQueue : Noncopyable
 {
 public:
     BlockQueue() 

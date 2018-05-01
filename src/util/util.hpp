@@ -114,6 +114,6 @@ inline std::vector<std::string> split(const std::string& str, char delim)
     return result;
 }
 
-}
+} // namespace Asuka
 
 #endif // ASUKA_UTIL_HPP

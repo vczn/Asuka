@@ -4,6 +4,7 @@
 #include "src/util/any.hpp"
 #include "src/util/block_queue.hpp"
 #include "src/util/string_view.hpp"
+#include "src/util/time_stamp.hpp"
 
 using namespace Asuka;
 
@@ -68,9 +69,27 @@ void test_string_view()
 
 }
 
+void test_time_stamp()
+{
+    TimeStamp ts1 = TimeStamp::create_invalid_timestamp();
+    UNIT_TEST(false, ts1.is_valid());
+
+    TimeStamp ts2 = TimeStamp::now();
+    UNIT_TEST(true, ts2.is_valid());
+#if 1
+    
+    std::cout << ts2.to_string() << std::endl;
+    std::cout << ts2.to_formatted_string() << std::endl;
+    std::cout << ts2.to_formatted_string(false) << std::endl;
+    
+
+#endif
+}
+
 int main()
 {
     test_any();
+    test_time_stamp();
 
     std::cout << test_pass << "/" << test_count
         << " (passed " << test_pass * 100.0 / test_count << "%)" << std::endl;
