@@ -20,6 +20,18 @@ namespace Asuka
 // don't use std::string_view in c++17
 // not template
 
+
+CONSTEXPR14 std::size_t get_length(const char* str)
+{
+    std::size_t len{};
+    while (*str != '\0')
+    {
+        ++str;
+        ++len;
+    }
+    return len;
+}
+
 // A constant contiguous sequence of `char`
 // StringView is far more effective
 // for constant contiguous sequence than std::string
@@ -311,16 +323,6 @@ private:
         }
     }
 
-    CONSTEXPR14 size_type get_length(const char* str)
-    {
-        size_type len{};
-        while (*str != '\0')
-        {
-            ++str;
-            ++len;
-        }
-        return len;
-    }
 private:
     const char* mData;
     size_type mSize;

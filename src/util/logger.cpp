@@ -15,17 +15,17 @@ const char* level_to_string(LogLevel lv)
     switch (lv)
     {
     case LogLevel::TRACE:
-        return "TRACE";
-    case Asuka::LogLevel::DEBUG:
-        return "DEBUG";
-    case Asuka::LogLevel::INFO:
-        return "INFO";
-    case Asuka::LogLevel::WARN:
-        return "WARN";
-    case Asuka::LogLevel::ERROR:
-        return "ERROR";
-    case Asuka::LogLevel::FATAL:
-        return "FATAL";
+        return "TRACE ";
+    case LogLevel::DEBUG:
+        return "DEBUG ";
+    case LogLevel::INFO:
+        return "INFO  ";
+    case LogLevel::WARN:
+        return "WARN  ";
+    case LogLevel::ERROR:
+        return "ERROR ";
+    case LogLevel::FATAL:
+        return "FATAL ";
     }
 
     return "UNKNOWN";

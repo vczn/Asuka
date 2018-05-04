@@ -17,7 +17,7 @@ template <std::size_t N>
 class LogBuffer
 {
 public:
-    LogBuffer() : mCur(mBuffer)
+    LogBuffer() : mCur(mData)
     {
     }
 
@@ -36,12 +36,12 @@ public:
 
     const char* data() const
     {
-        return mBuffer;
+        return mData;
     }
 
     std::size_t size() const
     {
-        return mCur - mBuffer;
+        return mCur - mData;
     }
 
     // write to buffer directly
@@ -62,26 +62,26 @@ public:
 
     void reset()
     {
-        mCur = mBuffer;
+        mCur = mData;
     }
 
     void bzero()
     {
-        ::bzero(mBuffer, N);
+        std::memset(mData, 0, N);
     }
 
     std::string to_string() const
     {
-        return std::string(mBuffer, size());
+        return std::string(mData, size());
     }
 
     StringView to_string_view() const
     {
-        return StringView{ mBuffer, size() };
+        return StringView{ mData, size() };
     }
 
 private:
-    char mBuffer[N];
+    char mData[N];
     char* mCur;
 };
 
