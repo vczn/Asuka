@@ -3,6 +3,7 @@
 
 #include "src/util/any.hpp"
 #include "src/util/block_queue.hpp"
+#include "src/util/logger.hpp"
 #include "src/util/string_view.hpp"
 #include "src/util/time_stamp.hpp"
 
@@ -70,6 +71,32 @@ void test_config()
 #endif
 }
 
+void test_log()
+{
+#if 0
+    {
+        LOG_TRACE << "abc" << 42 << 88.8;
+    }
+    {
+        LOG_DEBUG << "abc" << 42 << 88.8;
+    }
+    {
+        LOG_INFO << "abc" << 42 << 88.8;
+    }
+    {
+        LOG_WARN << "abc" << 42 << 88.8;
+    }
+   
+    errno = EINTR;
+    {
+        LOG_ERROR << "abc" << 42 << 88.8;
+    }
+    {
+        LOG_SYSERR << "abc" << 42 << 88.8;
+    }
+#endif
+}
+
 void test_string_view()
 {
 
@@ -82,19 +109,23 @@ void test_time_stamp()
 
     TimeStamp ts2 = TimeStamp::now();
     UNIT_TEST(true, ts2.is_valid());
-#if 1
+#if 0
     std::cout << ts2.to_string() << std::endl;
     std::cout << ts2.to_formatted_string() << std::endl;
     std::cout << ts2.to_formatted_string(false) << std::endl;
 #endif
 }
 
+
+
 int main()
 {
     test_any();
     test_time_stamp();
+    test_log();
 
     std::cout << test_pass << "/" << test_count
         << " (passed " << test_pass * 100.0 / test_count << "%)" << std::endl;
+    
     return 0;
 }

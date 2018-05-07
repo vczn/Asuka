@@ -28,7 +28,7 @@ inline std::size_t integer_to_string(char* buf, T value)
     do
     {
         int lp = static_cast<int>(value % 10);
-        lp /= 10;
+        value /= 10;
         *p++ = zero[lp];
     }
     while (value);

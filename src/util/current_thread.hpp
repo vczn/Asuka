@@ -23,7 +23,7 @@ inline std::thread::id current_thread_id()
 
 inline std::string current_thread_id_to_string()
 {
-    thread_local std::string idstr;
+    /* static */ thread_local std::string idstr;
     if (!idstr.empty())
         return idstr;
 

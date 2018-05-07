@@ -12,7 +12,10 @@
 namespace Asuka
 {
 
-enum class LogLevel : std::uint8_t
+// reference muduo
+// https://github.com/chenshuo/muduo/blob/master/muduo/base/Logging.h
+
+enum class LogLevel
 {
     TRACE,
     DEBUG,
@@ -28,27 +31,72 @@ inline bool operator<=(LogLevel lhs, LogLevel rhs)
 }
 
 
+// for simplifying the source file name
+struct SourceFile
+{
+    explicit SourceFile(const char* filename) : name(filename)
+    {
+        const char* slash = std::strrchr(name, '/');
+        if (slash)
+        {
+            name = slash + 1;
+        }
+    }
+
+    const char* name;
+};
+
+
 class Logger
 {
 public:
+    using OutputFunc = void(*)(const char* msg, std::size_t len);
+    using FlushFunc = void(*)();
 
 public:
     static void set_level(LogLevel lv);
     static LogLevel get_level();
 
-    Logger(LogLevel lv, const char* file, int line);
-    Logger(LogLevel lv, const char* file, int line, const char* func);
-    Logger(LogLevel lv, const char* file, int line, bool isAbort);
-    ~Logger();
+    static void set_output(OutputFunc func);
+    static void set_flush(FlushFunc func);
 
-    LogStream& get_stream()
+    // yyyy-mm-dd hh:mm:ss.uuuuuu level thread_tag(id) message - xxx.cpp:line
+    Logger(LogLevel lv, const char* file, int line);
+
+    // yyyy-mm-dd hh:mm:ss.uuuuuu level thread_tag(id) func message - xxx.cpp:line
+    Logger(LogLevel lv, const char* file, int line, const char* func);
+
+    // yyyy-mm-dd hh:mm:ss.uuuuuu level thread_tag(id) errmsg message - xxx.cpp:line
+    Logger(LogLevel lv, const char* file, int line, int savedError);
+
+
+    ~Logger() noexcept;
+
+    LogStream& get_stream();
+
+    struct Impl
     {
-        return mStream;
-    }
+    public:
+        Impl(LogLevel lv, const char* sf, int line);
+
+        void finish();
+    
+        LogStream stream;
+        LogLevel level;
+        SourceFile filename;
+        int line;
+    };
+
+private:
+    void default_output(const char* msg, std::size_t len);
+    void default_flush();
 
 private:
     static LogLevel sLevel;
-    LogStream mStream;
+    static OutputFunc sOutFunc;
+    static FlushFunc sFlushFunc;
+
+    Impl mImpl;
 };
 
 #define LOG_TRACE \
@@ -73,9 +121,9 @@ private:
 
 
 #define LOG_SYSERR \
-    Logger(LogLevel::ERROR, __FILE__, __LINE__, false).get_stream()
+    Logger(LogLevel::ERROR, __FILE__, __LINE__, errno).get_stream()
 #define LOG_SYSFATAL \
-    Logger(LogLevel::FATAL, __FILE__, __LINE__, true).get_stream()
+    Logger(LogLevel::FATAL, __FILE__, __LINE__, errno).get_stream()
 
 } // namespace Asuka
 

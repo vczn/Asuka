@@ -65,7 +65,7 @@ std::string TimeStamp::to_formatted_string(bool showUs) const
     {
         // yyyy-mm-dd hh:mm:ss.uuuuuu
         int us = static_cast<int>(mUs % kMicroPerSecond);
-        snprintf(buf, sizeof(buf), "%4d-%02d-%02d %02d:%02d:%02d.%6d",
+        snprintf(buf, sizeof(buf), "%4d-%02d-%02d %02d:%02d:%02d.%06d",
             tmTime.tm_year + 1900, tmTime.tm_mon + 1, tmTime.tm_mday,
             tmTime.tm_hour, tmTime.tm_min, tmTime.tm_sec, us);
     }
