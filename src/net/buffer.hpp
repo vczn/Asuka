@@ -1,4 +1,4 @@
-﻿// Part of Asuka utility, public header
+﻿// Part of Asuka net utility, public header
 // Copyleft 2018, vczn
 
 #include <vector>

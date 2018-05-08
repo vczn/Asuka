@@ -120,7 +120,7 @@ private:
     Logger(LogLevel::FATAL, __FILE__, __LINE__).get_stream()
 
 
-#define LOG_SYSERR \
+#define LOG_SYSERROR \
     Logger(LogLevel::ERROR, __FILE__, __LINE__, errno).get_stream()
 #define LOG_SYSFATAL \
     Logger(LogLevel::FATAL, __FILE__, __LINE__, errno).get_stream()

@@ -74,26 +74,14 @@ void test_config()
 void test_log()
 {
 #if 0
-    {
-        LOG_TRACE << "abc" << 42 << 88.8;
-    }
-    {
-        LOG_DEBUG << "abc" << 42 << 88.8;
-    }
-    {
-        LOG_INFO << "abc" << 42 << 88.8;
-    }
-    {
-        LOG_WARN << "abc" << 42 << 88.8;
-    }
+    LOG_TRACE << "abc" << 42 << 88.8;
+    LOG_DEBUG << "abc" << 42 << 88.8;
+    LOG_INFO << "abc" << 42 << 88.8;
+    LOG_WARN << "abc" << 42 << 88.8;
    
     errno = EINTR;
-    {
-        LOG_ERROR << "abc" << 42 << 88.8;
-    }
-    {
-        LOG_SYSERR << "abc" << 42 << 88.8;
-    }
+    LOG_ERROR << "abc" << 42 << 88.8;
+    LOG_SYSERR << "abc" << 42 << 88.8;
 #endif
 }
 
