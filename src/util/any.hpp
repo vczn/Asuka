@@ -17,8 +17,8 @@ namespace Asuka
 // don't use std::any in c++17
 // reference the boost
 
-// bad_any_cast naming is consistent with std
-class bad_any_cast : public std::bad_cast
+
+class BadAnyCast : public std::bad_cast
 {
 public:
     const char* what() const noexcept override
@@ -200,7 +200,7 @@ inline T any_cast(const Any& operand)
     
     U* result = any_cast<U>(std::addressof(operand));
     if (!result)
-        throw bad_any_cast();
+        throw BadAnyCast{};
 
     return static_cast<T>(*result);
 }
@@ -215,7 +215,7 @@ inline T any_cast(Any& operand)
 
     U* result = any_cast<U>(std::addressof(operand));
     if (!result)
-        throw bad_any_cast();
+        throw BadAnyCast{};
 
     return static_cast<T>(*result);
 }
@@ -230,7 +230,7 @@ T any_cast(Any&& operand)
 
     U* result = any_cast<U>(std::addressof(operand));
     if (!result)
-        throw bad_any_cast();
+        throw BadAnyCast{};
 
     return static_cast<T>(std::move(*result));
 }
