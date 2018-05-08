@@ -103,7 +103,7 @@ Logger::~Logger()
         default_output(buf.data(), buf.size());
     }
     
-    if (mImpl.level == LogLevel::FATAL)
+    if (mImpl.mLevel == LogLevel::FATAL)
     {
         if (sFlushFunc)
         {
@@ -120,7 +120,7 @@ Logger::~Logger()
 
 LogStream& Logger::get_stream()
 {
-    return mImpl.stream;
+    return mImpl.mStream;
 }
 
 void Logger::default_output(const char* msg, std::size_t len)
@@ -139,17 +139,17 @@ void Logger::default_flush()
 
 // TODO
 // thread_id => thread_tag
-Logger::Impl::Impl(LogLevel lv, const char* sf, int l)
-    : level(lv), filename(sf), line(l)
+Logger::Impl::Impl(LogLevel lv, const char* sf, int line)
+    : mLevel(lv), mFilename(sf), mLine(line)
 {
-    stream << TimeStamp::now().to_formatted_string() << ' '
+    mStream << TimeStamp::now().to_formatted_string() << ' '
         << level_to_string(lv) << ' '
         << current_thread_id_to_string() << ' ';
 }
 
 void Logger::Impl::finish()
 {
-    stream << " - " << filename.name << ":" << line << '\n';
+    mStream << " - " << mFilename.name << ':' << mLine << '\n';
 }
 
 } // namespace Asuka

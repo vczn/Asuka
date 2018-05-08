@@ -74,17 +74,17 @@ public:
 
     LogStream& get_stream();
 
-    struct Impl
+    class Impl
     {
     public:
         Impl(LogLevel lv, const char* sf, int line);
 
         void finish();
     
-        LogStream stream;
-        LogLevel level;
-        SourceFile filename;
-        int line;
+        LogStream mStream;
+        LogLevel mLevel;
+        SourceFile mFilename;
+        int mLine;
     };
 
 private:
