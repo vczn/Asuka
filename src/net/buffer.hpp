@@ -103,7 +103,10 @@ public:
     void append_uint16(std::uint16_t x);
     void append_uint8(std::uint8_t x);
 
-    
+    // read data directly into buffer
+    // on success, return the number of bytes read is returned
+    // on error, return -1 and `savedError` is set appropriately
+    ssize_t read_fd(int fd, int& savedError);
 private:
     void ensure_writable_bytes(std::size_t len);
     void add_writer_index(std::size_t len);

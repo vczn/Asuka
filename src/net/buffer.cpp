@@ -1,7 +1,10 @@
 ﻿#include "buffer.hpp"
 
+#include <sys/uio.h>
+
 #include <algorithm>
 #include <cassert>
+#include <cerrno>
 #include <utility>
 
 #include "endian.hpp"
@@ -279,6 +282,37 @@ void Buffer::append_uint16(std::uint16_t x)
 void Buffer::append_uint8(std::uint8_t x)
 {
     append(&x, sizeof(x));
+}
+
+ssize_t Buffer::read_fd(int fd, int& savedError)
+{
+    char extrabuf[65536];
+    struct iovec vec[2];
+    const std::size_t writable = writable_bytes();
+
+    vec[0].iov_base = write_begin();
+    vec[0].iov_len  = writable;
+    vec[1].iov_base = extrabuf;
+    vec[1].iov_len  = sizeof(extrabuf);
+
+    // when there is enough space in the buffer, don't read into extrabuf
+    const int iovcnt = writable < sizeof(extrabuf) ? 2 : 1;
+    const ssize_t n = ::readv(fd, vec, iovcnt);
+    if (n < 0)
+    {
+        savedError = errno;
+    }
+    else if (static_cast<std::size_t>(n) <= writable)
+    {
+        mWriterIndex += static_cast<std::size_t>(n);
+    }
+    else
+    {
+        mWriterIndex += mBuffer.size();
+        append(extrabuf, n - writable);
+    }
+
+    return n;
 }
 
 void Buffer::ensure_writable_bytes(std::size_t len)
