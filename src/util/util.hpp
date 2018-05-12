@@ -71,7 +71,7 @@ inline void err_ret(const char* fmt, ...)
     return;
 }
 
-void err_sysret(const char* fmt, ...)
+inline void err_sysret(const char* fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
