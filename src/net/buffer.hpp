@@ -1,13 +1,13 @@
 ﻿// Part of Asuka net utility, public header
 // Copyleft 2018, vczn
 
-#include <vector>
-
-#include "../util/string_view.hpp"
-
 #pragma once
 #ifndef ASUKA_BUFFER_HPP
 #define ASUKA_BUFFER_HPP
+
+#include <vector>
+
+#include "../util/string_view.hpp"
 
 namespace Asuka
 {

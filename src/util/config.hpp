@@ -1,15 +1,15 @@
 ﻿// Part of Asuka utility, internal header
 // Copyleft 2018, vczn
 
+#pragma once
+#ifndef ASUKA_CONFIG_HPP
+#define ASUKA_CONFIG_HPP
+
 #include <array>
 #include <fstream>
 
 #include "any.hpp"
 #include "noncopyable.hpp"
-
-#pragma once
-#ifndef ASUKA_CONFIG_HPP
-#define ASUKA_CONFIG_HPP
 
 namespace Asuka
 {

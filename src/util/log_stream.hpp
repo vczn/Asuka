@@ -1,17 +1,17 @@
 ﻿// Part of Asuka utility, log internal header
 // Copyleft 2018, vczn
 
-#include <algorithm>
-
-#include "log_buffer.hpp"
-
 #pragma once
 #ifndef ASUKA_LOG_STREAM
 #define ASUKA_LOG_STREAM
 
+
+#include <algorithm>
+
+#include "log_buffer.hpp"
+
 namespace Asuka
 {
-
 
 namespace 
 {

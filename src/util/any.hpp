@@ -1,14 +1,14 @@
 ﻿// Part of Asuka utility, internal header
 // Copyleft 2018, vczn
 
+#pragma once
+#ifndef ASUKA_ANY_HPP
+#define ASUKA_ANY_HPP
+
 #include <algorithm>
 #include <typeinfo>
 
 #include "type_traits.hpp"
-
-#pragma once
-#ifndef ASUKA_ANY_HPP
-#define ASUKA_ANY_HPP
 
 namespace Asuka
 {
