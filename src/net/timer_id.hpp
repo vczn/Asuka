@@ -44,6 +44,8 @@ public:
             std::swap(mTimer, tmp.mTimer);
             std::swap(mSequence, tmp.mSequence);
         }
+
+        return *this;
     }
 
     Timer* get_timer() const

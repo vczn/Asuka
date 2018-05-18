@@ -66,7 +66,7 @@ void close_sockfd(int fd)
 {
     if (::close(fd) == -1)
     {
-        LOG_SYSERROR << "close error";
+        LOG_SYSERROR << "close fd error";
     }
 }
 

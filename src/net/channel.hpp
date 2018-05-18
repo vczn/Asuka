@@ -65,8 +65,8 @@ public:
     bool is_writing() const;
 
     // for poller
-    int get_index() const;
-    int set_index() const;
+    std::size_t get_index() const;
+    void set_index(std::size_t idx);
 
     // for debuging
     std::string revents_to_string() const;
@@ -92,7 +92,7 @@ private:
 
     short mEvents;
     short mRevents;
-    int mIndex;     // for poller
+    std::size_t mIndex;     // for poller
 
     std::weak_ptr<void> mTie;
     bool mIsTied;

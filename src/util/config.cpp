@@ -16,9 +16,9 @@ const std::array<Any, Config::kNumberConfig> Config::kDefaultConfig
 {
 {
     Any{ static_cast<short>(8888) },
-    Any{ 2 },
+    Any{ 0 },
     Any{ false },
-    Any{ std::string{"/dev/tty"} }
+    Any{ std::string{""} }
 }
 };
 

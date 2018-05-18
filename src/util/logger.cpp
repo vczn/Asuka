@@ -2,7 +2,6 @@
 
 #include <cstdlib>
 
-#include "config.hpp"
 #include "current_thread.hpp"
 #include "time_stamp.hpp"
 
