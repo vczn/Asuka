@@ -47,11 +47,11 @@ public:
     void tie(const std::shared_ptr<void>& sp);
 
     int get_fd() const noexcept;
-    short get_events() const noexcept;
-    short get_revents() const noexcept;
+    std::uint32_t get_events() const noexcept;
+    std::uint32_t get_revents() const noexcept;
     EventLoop* get_owner_loop() const;
 
-    void set_revents(short revt);   // used by poller
+    void set_revents(std::uint32_t revt);   // used by poller
 
     bool is_none_event() const noexcept;
 
@@ -90,8 +90,8 @@ private:
     EventLoop* mLoop;
     const int mFd;
 
-    short mEvents;
-    short mRevents;
+    std::uint32_t mEvents;
+    std::uint32_t mRevents;
     std::size_t mIndex;     // for poller
 
     std::weak_ptr<void> mTie;
