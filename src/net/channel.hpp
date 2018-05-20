@@ -35,7 +35,7 @@ public:
     Channel(EventLoop* loop, int fd);
     ~Channel();
 
-    void handle_read(TimeStamp receivedTime);
+    void handle_event(TimeStamp receivedTime);
     
     void set_read_callback(ReadEventCallback cb);
     void set_write_callback(EventCallback cb);
@@ -80,11 +80,11 @@ private:
     static std::string static_events_to_string(int fd, int events);
 
     void update();
-    void handle_event_with_guard(TimeStamp receivedTime);
+    void handle_event_without_guard(TimeStamp receivedTime);
 
-    static const short kNoneEvent;
-    static const short kReadEvent;
-    static const short kWriteEvent;
+    static const std::uint32_t kNoneEvent;
+    static const std::uint32_t kReadEvent;
+    static const std::uint32_t kWriteEvent;
 
 private:
     EventLoop* mLoop;
@@ -98,7 +98,7 @@ private:
     bool mIsTied;
     bool mIsEventHanding;
     bool mIsAddedInLoop;
-    bool mCanLog;
+    bool mIsLogHup;
 
     ReadEventCallback mReadCallback;
     EventCallback mWriteCallback;
