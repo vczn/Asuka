@@ -63,6 +63,11 @@ private:
     std::uint64_t mSequence;
 };
 
+inline bool operator<(const TimerId& lhs, const TimerId& rhs)
+{
+    return lhs.get_timer() < rhs.get_timer();
+}
+
 } // namespace Net
 
 } // namespace Asuka

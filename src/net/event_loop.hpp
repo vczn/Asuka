@@ -89,7 +89,7 @@ public:
 
 private:
     void abort_not_in_loop_thread() const;
-    void handle_read();
+    void handle_read();  // wake up
     void pending_function();
 
     void print_active_channels() const; // DEBUG

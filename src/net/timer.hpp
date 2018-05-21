@@ -41,6 +41,11 @@ public:
         return mRepeat;
     }
 
+    TimeStamp get_expiration() const
+    {
+        return mExpiration;
+    }
+
     std::uint64_t get_sequence() const
     {
         return mSequence;

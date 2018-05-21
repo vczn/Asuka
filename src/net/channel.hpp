@@ -72,7 +72,7 @@ public:
     std::string revents_to_string() const;
     std::string events_to_string() const;
 
-    void set_cannot_log();
+    void set_not_loghup();
 
     void remove();
 
