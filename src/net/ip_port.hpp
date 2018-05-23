@@ -52,12 +52,12 @@ public:
     std::uint32_t get_ip_net_endian() const;
     std::uint16_t get_port_net_endian() const;
 
-    
-
     sa_family_t get_family() const;
 
     const sockaddr* get_sockaddr() const;
     void set_addr(const sockaddr& addr);
+
+    socklen_t get_address_length();
 private:
     union
     {

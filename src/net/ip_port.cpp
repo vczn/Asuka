@@ -218,6 +218,12 @@ void IpPort::set_addr(const sockaddr& addr)
     }
 }
 
+socklen_t IpPort::get_address_length()
+{
+    return mIPv6 ? static_cast<socklen_t>(sizeof(struct sockaddr_in6))
+        : static_cast<socklen_t>(sizeof(struct sockaddr_in));
+}
+
 } // namespace Net
 
 } // namespace Asuka

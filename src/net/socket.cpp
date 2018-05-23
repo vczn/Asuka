@@ -59,6 +59,11 @@ int create_nonblock_socket(sa_family_t family)
     set_nonblock(sockfd);
 #endif // SOCK_NONBLOCK
 
+    if (sockfd == -1)
+    {
+        LOG_SYSFATAL << "socket error";
+    }
+
     return sockfd;
 }
 
@@ -68,6 +73,19 @@ void close_sockfd(int fd)
     {
         LOG_SYSERROR << "close fd error";
     }
+}
+
+int get_socket_error(int sockfd)
+{
+    int optval = 0;
+    socklen_t optlen = static_cast<socklen_t>(sizeof(optval));
+
+    if (::getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &optval, &optlen) == -1)
+    {
+        return errno;
+    }
+    
+    return optval;
 }
 
 Socket::Socket(int fd) : mSockfd(fd)
