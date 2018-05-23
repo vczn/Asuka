@@ -32,15 +32,16 @@ const char* level_to_string(LogLevel lv)
     return "UNKNOWN";
 }
 
-// strerror_r for thread safe
 const std::size_t kErrnoBufferSize = 512;
 thread_local char tErrnoBuf[kErrnoBufferSize];
+
+} // unamed namespace 
+
+// strerror_r for thread safe
 const char* errno_to_string_r(int savedErrno)
 {
     return strerror_r(savedErrno, tErrnoBuf, sizeof(tErrnoBuf));
 }
-
-} // unamed namespace 
 
 // default log level
 #ifdef NDEBUG

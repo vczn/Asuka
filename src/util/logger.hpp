@@ -46,6 +46,7 @@ struct SourceFile
     const char* name;
 };
 
+const char* errno_to_string_r(int savedErrno);
 
 class Logger
 {

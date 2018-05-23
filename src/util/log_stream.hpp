@@ -77,6 +77,8 @@ public:
     // integer
     LogStream& operator<<(bool value);
     LogStream& operator<<(char value);
+    LogStream& operator<<(unsigned char value);
+    LogStream& operator<<(signed char value);
     LogStream& operator<<(short value);
     LogStream& operator<<(unsigned short value);
     LogStream& operator<<(int value);

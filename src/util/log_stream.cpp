@@ -40,6 +40,18 @@ LogStream& LogStream::operator<<(char value)
     return *this;
 }
 
+LogStream& LogStream::operator<<(unsigned char value)
+{
+    *this << (static_cast<unsigned>(value));
+    return *this;
+}
+
+LogStream& LogStream::operator<<(signed char value)
+{
+    *this << (static_cast<int>(value));
+    return *this;
+}
+
 LogStream& LogStream::operator<<(short value)
 {
     *this << (static_cast<int>(value));
