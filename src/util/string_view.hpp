@@ -11,7 +11,7 @@
 #include <stdexcept>
 #include <string>
 
-#include "cxx_version.hpp"
+#include "util.hpp"
 
 namespace Asuka
 {

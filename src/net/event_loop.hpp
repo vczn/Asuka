@@ -37,7 +37,7 @@ public:
     ~EventLoop();
 
     // must be called in same thread as creation of the object
-    void run();
+    void loop();
 
     // it is thread safe that it is called through shared_ptr<EventLoop>
     void quit();
@@ -73,9 +73,9 @@ public:
 
     // internal usage
     void wakeup();
-    void update_channel(Channel* channel);
-    void remove_channel(Channel* channel);
-    bool has_channel(Channel* channel) const;
+    void update_channel(Channel& channel);
+    void remove_channel(Channel& channel);
+    bool has_channel(const Channel& channel) const;
 
     void assert_in_loop_thread() const;
     bool is_in_loop_thread() const;
@@ -95,10 +95,12 @@ private:
     void print_active_channels() const; // DEBUG
 
 private:
-    std::atomic_bool mIsRun;
+    std::atomic_bool mIsLoop;
     std::atomic_bool mIsQuit;
     std::atomic_bool mIsEventing;
     std::atomic_bool mIsCallingPendingFunction;
+
+    std::uint64_t mIteration;
 
     const std::thread::id mThreadId; 
     TimeStamp mPollReturnTime;
@@ -107,12 +109,15 @@ private:
     std::unique_ptr<TimerQueue> mTimerQueue;
 
     int mWakeupFd;
+    std::unique_ptr<Channel> mWakeupChannel;
+
     Any mContext;
+
     std::vector<Channel*> mActiveChannels;
     Channel* mCurrentActiveChannel;
 
     mutable std::mutex mMutex;
-    std::vector<Function> mPendingFunction;  // Guarded by mMutex
+    std::vector<Function> mPendingFunctions;  // Guarded by mMutex
 };
 
 } // namespace Net

@@ -109,10 +109,7 @@ TimerQueue::~TimerQueue()
 {
     mTimerChannel.disable_all();
     mTimerChannel.remove();
-    if (::close(mTimerFd) == -1)
-    {
-        LOG_SYSERROR << "close timerfd error";
-    }
+    close_fd(mTimerFd, "close timerfd error");
     // automatically destroy and release every timer in mTimers
 }
 

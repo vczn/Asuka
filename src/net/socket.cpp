@@ -69,10 +69,7 @@ int create_nonblock_socket(sa_family_t family)
 
 void close_sockfd(int fd)
 {
-    if (::close(fd) == -1)
-    {
-        LOG_SYSERROR << "close fd error";
-    }
+    close_fd(fd, "close sockfd error");
 }
 
 int get_socket_error(int sockfd)

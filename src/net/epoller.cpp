@@ -39,10 +39,7 @@ Epoller::Epoller(EventLoop* loop)
 
 Epoller::~Epoller()
 {
-    if (::close(mEpollFd) == -1)
-    {
-        LOG_SYSERROR << "close epoll fd error";
-    }
+    close_fd(mEpollFd, "close epoll fd error");
 }
 
 TimeStamp Epoller::poll(int timeoutMs, ChannelList& activeChannels)
