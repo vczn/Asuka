@@ -23,6 +23,8 @@ namespace Net
 class Channel;
 class EventLoop;
 
+// `Connector` is used by `TcpClient` to 
+// connect the `TcpServer`
 class Connector : Noncopyable, 
                   public std::enable_shared_from_this<Connector>
 {
