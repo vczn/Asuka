@@ -12,6 +12,9 @@
 namespace Asuka
 {
 
+namespace Net
+{ 
+
 // reference muduo
 // https://github.com/chenshuo/muduo/blob/master/muduo/net/Buffer.h
 
@@ -121,6 +124,8 @@ private:
     static const std::size_t kInitialSize;
     static const std::size_t kPrependSize;
 };
+
+} // namespace Net
 
 } // namespace Asuka
 

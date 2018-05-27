@@ -12,6 +12,9 @@
 namespace Asuka
 {
 
+namespace Net
+{ 
+
 const char Buffer::kCRLF[] = "\r\n";
 const std::size_t Buffer::kInitialSize = 1024;
 const std::size_t Buffer::kPrependSize = 8;
@@ -354,5 +357,7 @@ void Buffer::sub_writer_index(std::size_t len)
     assert(len <= readable_bytes());
     mWriterIndex -= len;
 }
+
+} // namespace Net
 
 } // namespace Asuka
