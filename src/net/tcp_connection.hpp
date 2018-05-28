@@ -12,6 +12,7 @@
 
 #include "../util/any.hpp"
 #include "../util/noncopyable.hpp"
+#include "../util/string_view.hpp"
 #include "buffer.hpp"
 #include "callback.hpp"
 #include "ip_port.hpp"
@@ -49,24 +50,22 @@ public:
     bool get_tcp_info(struct tcp_info* tcpInfo) const;
     std::string get_tcp_info_to_string() const;
 
-    void send(const void* message, int len);
+    void send(const void* message, std::size_t len);
     void send(const StringView& message);
-    void send(std::string&& message);
-    void send(const Buffer& message);  // will swap data
-    void send(Buffer&& message);
+    void send(Buffer& message);  // will swap data
 
     // FIXME not thread safe, no simultaneous calling
     void shutdown();
     void force_close();
     void force_close_with_delay(double seconds);
 
-    void set_tcp_no_delay();
+    void set_tcp_no_delay();    // default is on
 
     void start_read();
     void stop_read();
     bool is_reading() const;
 
-    void set_context();
+    void set_context(const Any& context);
     const Any& get_context() const;
     Any& get_context();
 
@@ -90,10 +89,29 @@ public:
 public:
     using Status = std::uint8_t;
 private:
+    void handle_read(TimeStamp receivedTime);
+    void handle_write();
+    void handle_close();
+    void handle_error();
+
+    void send_in_loop(const void* data, std::size_t len);
+    
+
+    void shutdown_in_loop();
+    void force_close_in_loop();
+
+    void set_status(Status s);
+    const char* status_to_string() const;
+    void start_read_in_loop();
+    void stop_read_in_loop();
+
+
+private:
     static const Status kDisConnected    = 0;
     static const Status kIsConnecting    = 1;
     static const Status kConnected       = 2;
     static const Status kIsDisConnecting = 3;
+
 private:
 
     EventLoop* mLoop;

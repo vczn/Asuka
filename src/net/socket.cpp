@@ -163,8 +163,10 @@ void Socket::close()
     close_sockfd(mSockfd);
 }
 
-void Socket::set_delay(int optval)
+void Socket::set_no_delay(int optval)
 {
+    // `optval` is 1, will set no delay
+    // in other words, will disable Nagle algorithm
     if (::setsockopt(mSockfd, IPPROTO_TCP, TCP_NODELAY,
         &optval, static_cast<socklen_t>(sizeof(optval))) == -1)
     {

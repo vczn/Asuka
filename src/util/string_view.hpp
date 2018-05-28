@@ -60,6 +60,12 @@ public:
     constexpr StringView(const StringView& rhs) noexcept = default;
     constexpr StringView& operator=(const StringView& rhs) noexcept = default;
 
+    StringView(const std::string& str)  // extend
+        : mData(str.data()),
+          mSize(str.size())
+    {
+    }
+
     constexpr StringView(const_pointer str, size_type len)
         : mData(str),
           mSize(len)
@@ -309,7 +315,7 @@ public:
         return find(StringView{ str }, pos1);
     }
 
-    std::string to_string()
+    std::string to_string() const
     {
         return std::string{ mData, mSize };
     }

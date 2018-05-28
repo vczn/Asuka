@@ -41,7 +41,7 @@ public:
     // Disable Negle algorithm of tcp if the option is on
     // This is used for application which generate small packets,
     // such as telnet, rlogin, etc
-    void set_delay(int optval);
+    void set_no_delay(int optval);
 
     // `optval`: 1 is on, 0 is off
     void set_keep_alive(int optval);
