@@ -25,6 +25,15 @@ void close_fd(int fd);
 
 std::vector<std::string> split(const std::string& str, char delim);
 
+
+template <typename T>
+T* check_not_nullptr(T* ptr)
+{
+    if (!ptr)
+        err_quit("ptr is nullptr");
+    return ptr;
+}
+
 } // namespace Asuka
 
 #endif // ASUKA_UTIL_HPP

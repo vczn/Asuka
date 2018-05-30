@@ -85,6 +85,30 @@ int get_socket_error(int sockfd)
     return optval;
 }
 
+SockaddrUnion get_local_address(int sockfd)
+{
+    SockaddrUnion sockaddr;
+    ::bzero(&sockaddr, sizeof(sockaddr));
+    socklen_t len = static_cast<socklen_t>(sizeof(sockaddr));
+    if (::getsockname(sockfd, &sockaddr.sa, &len) < 0)
+    {
+        LOG_SYSERROR << "getsockname error";
+    }
+    return sockaddr;
+}
+
+SockaddrUnion get_peer_address(int sockfd)
+{
+    SockaddrUnion sockaddr;
+    ::bzero(&sockaddr, sizeof(sockaddr));
+    socklen_t len = static_cast<socklen_t>(sizeof(sockaddr));
+    if (::getpeername(sockfd, &sockaddr.sa, &len) < 0)
+    {
+        LOG_SYSERROR << "getpeername error";
+    }
+    return sockaddr;
+}
+
 Socket::Socket(int fd) : mSockfd(fd)
 {
     set_reuseaddr(1);

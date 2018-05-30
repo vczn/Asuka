@@ -17,6 +17,13 @@ namespace Asuka
 namespace Net
 {
 
+union SockaddrUnion 
+{
+    struct sockaddr sa;
+    struct sockaddr_in in4;
+    struct sockaddr_in6 in6;
+};
+
 // IP string + 16 bit port# => IPv4 addr
 void to_ipport(const char* ip, std::uint16_t port, struct sockaddr_in* addr);
 
@@ -41,6 +48,7 @@ public:
 
     IpPort(const sockaddr_in& addr);
     IpPort(const sockaddr_in6& addr6);
+    IpPort(const SockaddrUnion& addr);
 
     IpPort(const IpPort& rhs) = default;
     IpPort& operator=(const IpPort& rhs) = default;
@@ -59,13 +67,7 @@ public:
 
     socklen_t get_address_length();
 private:
-    union
-    {
-        sockaddr_in mAddr4;
-        sockaddr_in6 mAddr6;
-    };
-
-    bool mIPv6;
+    SockaddrUnion mSockAddr;
 };
 
 } // namespace Net

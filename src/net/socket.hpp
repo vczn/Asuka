@@ -19,6 +19,8 @@ void set_nonblock_and_close_on_exec(int sockfd);
 int create_nonblock_socket(sa_family_t family);
 void close_sockfd(int fd);
 int get_socket_error(int sockfd);
+SockaddrUnion get_local_address(int sockfd);
+SockaddrUnion get_peer_address(int sockfd);
 
 
 class Socket

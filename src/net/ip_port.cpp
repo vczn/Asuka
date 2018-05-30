@@ -106,26 +106,26 @@ void ipport_to_string(char* buf, socklen_t len, const sockaddr* addr)
     std::snprintf(buf + endpos, len - endpos, ":" PRIu16"", port);
 }
 
-IpPort::IpPort() : mIPv6(false)
+IpPort::IpPort()
 {
-    ::bzero(&mAddr4, sizeof(mAddr4));
+    ::bzero(&mSockAddr, sizeof(mSockAddr));
 }
 
-IpPort::IpPort(std::uint16_t port, bool ipv6) : mIPv6(ipv6)
+IpPort::IpPort(std::uint16_t port, bool ipv6)
 {
     if (ipv6)
     {
-        ::bzero(&mAddr6, sizeof(mAddr6));
-        mAddr6.sin6_family = AF_INET6;
-        mAddr6.sin6_addr = in6addr_any;
-        mAddr6.sin6_port = host_to_net16(port);
+        ::bzero(&mSockAddr.in6, sizeof(mSockAddr.in6));
+        mSockAddr.in6.sin6_family = AF_INET6;
+        mSockAddr.in6.sin6_addr = in6addr_any;
+        mSockAddr.in6.sin6_port = host_to_net16(port);
     }
     else // ipv4
     {
-        ::bzero(&mAddr4, sizeof(mAddr4));
-        mAddr4.sin_family = AF_INET;
-        mAddr4.sin_addr.s_addr = host_to_net32(INADDR_ANY);
-        mAddr4.sin_port = host_to_net16(port);
+        ::bzero(&mSockAddr.in4, sizeof(mSockAddr.in4));
+        mSockAddr.in4.sin_family = AF_INET;
+        mSockAddr.in4.sin_addr.s_addr = host_to_net32(INADDR_ANY);
+        mSockAddr.in4.sin_port = host_to_net16(port);
     }
 }
 
@@ -135,27 +135,33 @@ IpPort::IpPort(const std::string& ip, std::uint16_t port, bool ipv6)
 }
 
 IpPort::IpPort(const char* ip, std::uint16_t port, bool ipv6)
-    : mIPv6(ipv6)
 {
     if (ipv6)
     {
-        ::bzero(&mAddr6, sizeof(mAddr6));
-        to_ipport(ip, port, &mAddr6);
+        ::bzero(&mSockAddr.in6, sizeof(mSockAddr.in6));
+        to_ipport(ip, port, &mSockAddr.in6);
     }
     else
     {
-        ::bzero(&mAddr4, sizeof(mAddr4));
-        to_ipport(ip, port, &mAddr4);
+        ::bzero(&mSockAddr.in4, sizeof(mSockAddr.in4));
+        to_ipport(ip, port, &mSockAddr.in6);
     }
 }
 
 IpPort::IpPort(const sockaddr_in& addr)
-    : mAddr4(addr), mIPv6(false)
 {
+    ::bzero(&mSockAddr.in4, sizeof(mSockAddr.in4));
+    mSockAddr.in4 = addr;
 }
 
-IpPort::IpPort(const sockaddr_in6 & addr6)
-    : mAddr6(addr6), mIPv6(true)
+IpPort::IpPort(const sockaddr_in6& addr6)
+{
+    ::bzero(&mSockAddr.in6, sizeof(mSockAddr.in6));
+    mSockAddr.in6 = addr6;
+}
+
+IpPort::IpPort(const SockaddrUnion& addr)
+    : mSockAddr(addr)
 {
 }
 
@@ -184,43 +190,44 @@ std::string IpPort::get_ipport() const
 std::uint32_t IpPort::get_ip_net_endian() const
 {
     assert(get_family() == AF_INET);
-    return mAddr4.sin_addr.s_addr;
+    return mSockAddr.in4.sin_addr.s_addr;
 }
 
 std::uint16_t IpPort::get_port_net_endian() const
 {
-    return mIPv6 ? mAddr6.sin6_port : mAddr4.sin_port;
+    return mSockAddr.sa.sa_family == AF_INET6 
+        ? mSockAddr.in6.sin6_port 
+        : mSockAddr.in4.sin_port;
 }
 
 sa_family_t IpPort::get_family() const
 {
-    return mIPv6 ? mAddr6.sin6_family : mAddr4.sin_family;
+    return mSockAddr.sa.sa_family;
 }
 
-const sockaddr * IpPort::get_sockaddr() const
+const sockaddr* IpPort::get_sockaddr() const
 {
-    return mIPv6
-        ? reinterpret_cast<const struct sockaddr*>(&mAddr6)
-        : reinterpret_cast<const struct sockaddr*>(&mAddr4);
+    return mSockAddr.sa.sa_family == AF_INET6
+        ? reinterpret_cast<const struct sockaddr*>(&mSockAddr.in6)
+        : reinterpret_cast<const struct sockaddr*>(&mSockAddr.in4);
 }
 
 void IpPort::set_addr(const sockaddr& addr)
 {
     if (addr.sa_family == AF_INET)
     {
-        mIPv6 = false;
-        mAddr4 = *reinterpret_cast<const sockaddr_in*>(&addr);
+        mSockAddr.in4 = *reinterpret_cast<const sockaddr_in*>(&addr);
     }
     else
     {
-        mIPv6 = true;
-        mAddr6 = *reinterpret_cast<const sockaddr_in6*>(&addr);
+        mSockAddr.in6 = *reinterpret_cast<const sockaddr_in6*>(&addr);
     }
 }
 
 socklen_t IpPort::get_address_length()
 {
-    return mIPv6 ? static_cast<socklen_t>(sizeof(struct sockaddr_in6))
+    return mSockAddr.sa.sa_family == AF_INET6 
+        ? static_cast<socklen_t>(sizeof(struct sockaddr_in6))
         : static_cast<socklen_t>(sizeof(struct sockaddr_in));
 }
 
