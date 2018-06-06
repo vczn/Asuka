@@ -1,4 +1,4 @@
-﻿// Part of Asuka utility, internal header
+// Part of Asuka utility, internal header
 // Copyleft 2018, vczn
 
 #pragma once
@@ -272,12 +272,12 @@ public:
     CONSTEXPR14 size_type find(const StringView& sv, 
         size_type pos1 = 0) const noexcept
     {
-        if (pos1 >= size())
+        if (mSize < sv.mSize || pos1 + sv.mSize > mSize)
         {
             return npos;
         }
 
-        for (size_type i = pos1; i < size(); ++i)
+        for (size_type i = pos1; i <= size() - sv.size(); ++i)
         {
             if (mData[i] == sv[0])  // matched the first character
             {
