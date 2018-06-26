@@ -80,24 +80,24 @@ TimeStamp Epoller::poll(int timeoutMs, ChannelList& activeChannels)
 void Epoller::update_channel(Channel& channel)
 {
     PollerBase::assert_in_loop_thread();
-    const std::size_t idx = channel.get_index();
+    const int idx = channel.get_index();
 
     LOG_TRACE << "fd = " << channel.get_fd()
         << ", events = " << channel.get_events()
         << ", index = " << idx;
 
-    if (idx == kNone || idx == kDeleted)
+    if (idx == kNew || idx == kDeleted)
     {
         // a new, add the channel
         int fd = channel.get_fd();
-        if (idx == kNone)
+        if (idx == kNew)
         {
-            assert(mChannels.find(fd) != mChannels.end());
+            assert(mChannels.find(fd) == mChannels.end());
             mChannels[fd] = &channel;
         }
         else // idx == kDeleted
         {
-            assert(mChannels.find(fd) == mChannels.end());
+            assert(mChannels.find(fd) != mChannels.end());
             assert(mChannels.at(fd) == &channel);
         }
 
@@ -146,7 +146,7 @@ void Epoller::remove_channel(Channel& channel)
         update(EPOLL_CTL_DEL, channel);
     }
 
-    channel.set_index(kNone);
+    channel.set_index(kNew);
 }
 
 void Epoller::fill_active_channels(int numEvents, 

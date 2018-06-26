@@ -32,7 +32,7 @@ public:
 public:
     static Config& instance();
 
-    short get_port() const;
+    std::uint16_t get_port() const;
 
     int get_threads() const;
 

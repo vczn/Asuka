@@ -29,7 +29,8 @@ public:
     EventLoopThreadPool(EventLoop* baseLoop, std::string name);
     ~EventLoopThreadPool();
 
-    void set_thread_number(int num);
+    // call it before calling `start()`
+    void set_thread_number(std::size_t num);
     void start(ThreadInitCallback cb = ThreadInitCallback());
 
     // vaild after calling `start()`
@@ -47,7 +48,7 @@ private:
     EventLoop* mBaseLoop;
     std::string mName;
     bool mIsStarted;
-    int mNumThreads;
+    std::size_t mNumThreads;
     int mNext;
     std::vector<std::unique_ptr<EventLoopThread>> mThreads;
     std::vector<EventLoop*> mLoops;

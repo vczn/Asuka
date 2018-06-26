@@ -47,12 +47,12 @@ void Channel::handle_event(TimeStamp receivedTime)
         guard = mTie.lock();
         if (guard)
         {
-            handle_event_without_guard(receivedTime);
+            handle_event_with_guard(receivedTime);
         }
     }
     else
     {
-        handle_event_without_guard(receivedTime);
+        handle_event_with_guard(receivedTime);
     }
 }
 
@@ -151,12 +151,12 @@ bool Channel::is_writing() const
     return mEvents & kWriteEvent;
 }
 
-std::size_t Channel::get_index() const
+int Channel::get_index() const
 {
     return mIndex;
 }
 
-void Channel::set_index(std::size_t idx)
+void Channel::set_index(int idx)
 {
     mIndex = idx;
 }
@@ -212,7 +212,7 @@ void Channel::update()
     mLoop->update_channel(*this);
 }
 
-void Channel::handle_event_without_guard(TimeStamp receivedTime)
+void Channel::handle_event_with_guard(TimeStamp receivedTime)
 {
     mIsEventHanding = true;
     LOG_TRACE << revents_to_string();

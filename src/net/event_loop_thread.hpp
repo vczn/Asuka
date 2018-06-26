@@ -27,8 +27,7 @@ public:
     using ThreadInitCallback = std::function<void(EventLoop*)>;
 
 public:
-    EventLoopThread(ThreadInitCallback cb = ThreadInitCallback(),
-        const std::string& name = std::string());
+    EventLoopThread(ThreadInitCallback cb = ThreadInitCallback());
 
     ~EventLoopThread();
 
@@ -40,10 +39,10 @@ private:
 private:
     EventLoop* mLoop;
     bool mIsExiting;
+    ThreadInitCallback mCallback;
     std::thread mThread;
     std::mutex mMutex;
     std::condition_variable mCond;
-    ThreadInitCallback mCallback;
 };
 
 } // namespace Net

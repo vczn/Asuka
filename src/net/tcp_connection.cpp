@@ -51,14 +51,13 @@ TcpConnection::TcpConnection(EventLoop* loop,
       mPeerAddr(peerAddr), 
       mHighWaterMark(60 * 1024 * 1024)
 {
-    assert(!loop);
     mChannel->set_read_callback(std::bind(&TcpConnection::handle_read, 
         this, std::placeholders::_1));
     mChannel->set_write_callback(std::bind(&TcpConnection::handle_write,
         this));
     mChannel->set_close_callback(std::bind(&TcpConnection::handle_close,
         this));
-    mChannel->set_close_callback(std::bind(&TcpConnection::handle_error,
+    mChannel->set_error_callback(std::bind(&TcpConnection::handle_error,
         this));
     LOG_DEBUG << "TcpConnection ctor[" << mName << "] at " << this
         << " fd = " << sockfd;
@@ -73,7 +72,7 @@ TcpConnection::~TcpConnection()
     assert(mStatus == kDisConnected);
 }
 
-const EventLoop* TcpConnection::get_loop() const
+EventLoop* TcpConnection::get_loop()
 {
     return mLoop;
 }
@@ -267,7 +266,7 @@ Buffer& TcpConnection::get_output_buffer()
 void TcpConnection::connect_established()
 {
     mLoop->assert_in_loop_thread();
-    assert(mStatus == kDisConnected);
+    assert(mStatus == kIsConnecting);
     set_status(kConnected);
     mChannel->tie(shared_from_this());
     mChannel->enable_read();
@@ -399,7 +398,7 @@ void TcpConnection::send_in_loop(const void* data, std::size_t len)
                 remaining = len - static_cast<std::size_t>(nwrote);
                 if (remaining == 0 && mWriteCompleteCallback)
                 {
-                    mLoop->run_in_loop(std::bind(mWriteCompleteCallback, 
+                    mLoop->queue_in_loop(std::bind(mWriteCompleteCallback, 
                         shared_from_this()));
                 }
             }
@@ -414,7 +413,7 @@ void TcpConnection::send_in_loop(const void* data, std::size_t len)
             && oldLen < mHighWaterMark
             && mHighWaterMarkCallback)
         {
-            mLoop->run_in_loop(std::bind(mHighWaterMarkCallback, 
+            mLoop->queue_in_loop(std::bind(mHighWaterMarkCallback, 
                 shared_from_this(), oldLen + remaining));
         }
         mOutputBuffer.append(static_cast<const char*>(data) + nwrote, remaining);

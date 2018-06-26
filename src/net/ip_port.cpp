@@ -103,7 +103,7 @@ void ipport_to_string(char* buf, socklen_t len, const sockaddr* addr)
         port = net_to_host16(addr6->sin6_port);
     }
 
-    std::snprintf(buf + endpos, len - endpos, ":" PRIu16"", port);
+    std::snprintf(buf + endpos, len - endpos, ":%" PRIu16"", port);
 }
 
 IpPort::IpPort()

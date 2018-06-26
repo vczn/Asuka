@@ -28,9 +28,9 @@ Config& Config::instance()
     return config;
 }
 
-short Config::get_port() const
+std::uint16_t Config::get_port() const
 {
-    return any_cast<short>(mConfig[kPortIndex]);
+    return any_cast<std::uint16_t>(mConfig[kPortIndex]);
 }
 
 int Config::get_threads() const
@@ -150,7 +150,7 @@ void Config::parse_line(const std::string& line, std::size_t curLine)
         break;
     case 'p':   // port
         value = parse_value(line, idx, "port", 4, curLine);
-        mConfig[kPortIndex] = static_cast<short>(std::stoi(value));
+        mConfig[kPortIndex] = static_cast<std::uint16_t>(std::stoi(value));
         break;
     case 't':   // threads
         value = parse_value(line, idx, "threads", 7, curLine);

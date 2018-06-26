@@ -32,9 +32,9 @@ public:
 
 private:
     static const std::size_t kInitEventListSize = 32;
-    static const std::size_t kNone    = 0;
-    static const std::size_t kAdded   = 1;
-    static const std::size_t kDeleted = 2;
+    static const int kNew     = -1;
+    static const int kAdded   = 1;
+    static const int kDeleted = 2;
 
 private:
     void fill_active_channels(int numEvents, ChannelList& activeChannels) const;

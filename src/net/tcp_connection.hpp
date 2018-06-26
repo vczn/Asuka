@@ -38,7 +38,7 @@ public:
                   const IpPort& peerAddr);
     ~TcpConnection();
 
-    const EventLoop* get_loop() const;
+    EventLoop* get_loop();
     const std::string& get_name() const;
     const IpPort& get_local_address() const;
     const IpPort& get_peer_address() const;

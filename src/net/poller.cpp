@@ -63,7 +63,7 @@ void Poller::update_channel(Channel& channel)
 
         mPollfdList.push_back(pfd);
         assert(!mPollfdList.empty());
-        std::size_t idx = mPollfdList.size() - 1;
+        int idx = static_cast<int>(mPollfdList.size() - 1);
         channel.set_index(idx);
         mChannels[pfd.fd] = &channel;
     }
@@ -98,8 +98,8 @@ void Poller::remove_channel(Channel& channel)
     assert(mChannels.at(channel.get_fd()) == &channel);
     assert(channel.is_none_event());
 
-    std::size_t idx = channel.get_index();
-    assert(idx < mPollfdList.size());
+    int idx = channel.get_index();
+    assert(idx < static_cast<int>(mPollfdList.size()));
     const struct pollfd& pfd = mPollfdList[idx];
     assert(pfd.fd == -channel.get_fd() - 1);
     assert(pfd.events == static_cast<short>(channel.get_events()));
@@ -110,7 +110,7 @@ void Poller::remove_channel(Channel& channel)
     (void)n;
 
     // remove pollfd from `mPollfdList`
-    if (idx == mPollfdList.size() - 1)
+    if (idx == static_cast<int>(mPollfdList.size() - 1))
     {
         // the pollfd which will be removed at the end
         mPollfdList.pop_back();

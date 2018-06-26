@@ -11,6 +11,7 @@
 #include <memory>
 
 #include "../util/noncopyable.hpp"
+#include "event_loop_thread_pool.hpp"
 #include "tcp_connection.hpp"
 
 namespace Asuka
@@ -31,7 +32,7 @@ public:
     TcpServer(EventLoop* loop, 
               const IpPort& listenAddr, 
               std::string name, 
-              bool reusePort);
+              int reusePort = 0);
     ~TcpServer();
 
     const std::string& get_ipport() const;
@@ -48,8 +49,7 @@ public:
     void set_thread_number(std::size_t num);
     void set_thread_init_callback(ThreadInitCallback cb);
 
-    // TODO
-    // std::shared_ptr<EventLoopThreadPool> get_thread_pool();
+    std::shared_ptr<EventLoopThreadPool> get_thread_pool();
 
     void set_connection_callback(ConnectionCallback cb);
     void set_message_callback(MessageCallback cb);
@@ -77,14 +77,15 @@ private:
     const std::string mName;
 
     std::unique_ptr<Acceptor> mAcceptor;
-    // TODO thread pool
-    // std::shared_ptr<EventLoopThreadPool> mThreadPool;
+
+    std::shared_ptr<EventLoopThreadPool> mThreadPool;
 
     ConnectionCallback mConnectionCallback;
     MessageCallback mMessageCallback;
     WriteCompleteCallback mWriteCompleteCallback;
     
-    std::atomic<std::int32_t> mStarted; // ???
+    std::atomic<std::int32_t> mStarted; 
+    ThreadInitCallback mThreadInitCallback;
 
     // always in the loop thread
     int mNextConnId;

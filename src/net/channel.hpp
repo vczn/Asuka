@@ -65,8 +65,8 @@ public:
     bool is_writing() const;
 
     // for poller
-    std::size_t get_index() const;
-    void set_index(std::size_t idx);
+    int get_index() const;
+    void set_index(int idx);
 
     // for debuging
     std::string revents_to_string() const;
@@ -80,7 +80,7 @@ private:
     static std::string static_events_to_string(int fd, int events);
 
     void update();
-    void handle_event_without_guard(TimeStamp receivedTime);
+    void handle_event_with_guard(TimeStamp receivedTime);
 
     static const std::uint32_t kNoneEvent;
     static const std::uint32_t kReadEvent;
@@ -92,7 +92,7 @@ private:
 
     std::uint32_t mEvents;
     std::uint32_t mRevents;
-    std::size_t mIndex;     // for poller
+    int mIndex;     // for poller
 
     std::weak_ptr<void> mTie;
     bool mIsTied;
