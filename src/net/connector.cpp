@@ -49,9 +49,8 @@ void Connector::start()
 void Connector::stop()
 {
     mIsConnect = false;
-    // ??? FIXME unsafe
-    mLoop->queue_in_loop(std::bind(&Connector::stop_in_loop, this));
-    // ??? FIXME cancel timer
+    mLoop->queue_in_loop(std::bind(&Connector::stop_in_loop, shared_from_this()));
+    // FIXME: cancel timer
 }
 
 void Connector::restart()
@@ -93,8 +92,6 @@ void Connector::stop_in_loop()
     if (mStatus == kIsConnecting)
     {
         set_status(kDisConnected);
-        // !!!
-        LOG_DEBUG << "connector remove_and_reset_channel";
         int sockfd = remove_and_reset_channel();
         retry(sockfd);
     }

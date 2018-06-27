@@ -176,8 +176,6 @@ void Socket::connect(const IpPort& peeraddr)
 
 void Socket::shutdown_write()
 {
-    // !!!
-    LOG_DEBUG << "::shutdown";
     if (::shutdown(mSockfd, SHUT_WR) == -1)
     {
         LOG_SYSERROR << "shutdown write error";
