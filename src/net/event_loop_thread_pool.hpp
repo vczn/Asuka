@@ -1,4 +1,4 @@
-﻿// Part of Asuka net utility, internal header
+﻿// Part of Asuka net utility, public header
 // Copyleft 2018, vczn
 
 #pragma once

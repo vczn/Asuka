@@ -202,7 +202,7 @@ void EventLoop::loop()
         pending_function();
     }
 
-    LOG_TRACE << "EventLoop " << this << "stop looping";
+    LOG_TRACE << "EventLoop " << this << " stop looping";
     mIsLoop = false;
 }
 

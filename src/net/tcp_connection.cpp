@@ -264,8 +264,6 @@ Buffer& TcpConnection::get_output_buffer()
 
 void TcpConnection::connect_established()
 {
-    // !!!
-    LOG_DEBUG << " ";
     mLoop->assert_in_loop_thread();
     assert(mStatus == kIsConnecting);
     set_status(kConnected);
@@ -277,8 +275,6 @@ void TcpConnection::connect_established()
 
 void TcpConnection::connect_destroy()
 {
-    // !!!
-    LOG_DEBUG << " ";
     mLoop->assert_in_loop_thread();
     if (mStatus == kConnected)
     {
