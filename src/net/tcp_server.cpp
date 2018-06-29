@@ -134,7 +134,7 @@ void TcpServer::remove_connection(const TcpConnectionPtr& conn)
         this, conn));
 }
 
-void TcpServer::remove_connection_in_loop(const TcpConnectionPtr & conn)
+void TcpServer::remove_connection_in_loop(const TcpConnectionPtr& conn)
 {
     mLoop->assert_in_loop_thread();
 

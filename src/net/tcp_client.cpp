@@ -20,10 +20,10 @@ void gremove_connection(EventLoop* loop, const TcpConnectionPtr& conn)
     loop->queue_in_loop(std::bind(&TcpConnection::connect_destroy, conn));
 }
 
-void gremove_connector(const ConnectorPtr& connector)
-{
-    
-}
+//void gremove_connector(const ConnectorPtr& connector)
+//{
+//    
+//}
 
 } // unnamed namespace
 
@@ -53,8 +53,6 @@ TcpClient::~TcpClient()
 
     {
         std::lock_guard<std::mutex> lock{ mMutex };
-        // !!!
-        LOG_DEBUG << "use_count: " << mConnection.use_count();
         isUnique = mConnection.use_count() == 1;
         conn = mConnection;
     }
@@ -67,21 +65,18 @@ TcpClient::~TcpClient()
         mLoop->run_in_loop(
             std::bind(&TcpConnection::set_close_callback, conn, cb));
 
-        // !!!
-        LOG_DEBUG << "conn";
         if (isUnique)
         {
-            // !!!
-            LOG_DEBUG << "conn->force_close";
             conn->force_close();
         }
     }
     else
     {
-        // !!!
-        LOG_DEBUG << "connector->stop";
-        mConnector->stop();
-        mLoop->run_after(1, std::bind(gremove_connector, mConnector));
+        if (mConnector)
+        {
+            mConnector->stop();
+            //mLoop->run_after(1, std::bind(gremove_connector, mConnector));
+        }
     }
 }
 
@@ -105,8 +100,6 @@ void TcpClient::disconnect()
         std::lock_guard<std::mutex> lock{ mMutex };
         if (mConnection)
         {
-            // !!!
-            LOG_DEBUG << "conn shutdown";
             mConnection->shutdown();
         }
     }
@@ -188,8 +181,6 @@ void TcpClient::new_connection(int sockfd)
 
 void TcpClient::remove_connection(const TcpConnectionPtr& conn)
 {
-    // !!!
-    LOG_DEBUG << " ";
     mLoop->assert_in_loop_thread();
     assert(mLoop == conn->get_loop());
 
