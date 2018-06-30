@@ -11,6 +11,8 @@
 namespace Asuka
 {
 
+#ifndef ASUKACXX17
+
 // logical AND
 template <typename...>
 struct conjunction : std::true_type {};
@@ -62,6 +64,26 @@ constexpr bool is_copy_constructible_v = std::is_copy_constructible<T>::value;
 template <typename T, typename U>
 constexpr bool is_same_v = std::is_same<T, U>::value;
 
-}
+#else
+using std::conjunction;
+using std::conjunction_v;
+using std::disjunction;
+using std::disjunction_v;
+using std::negation;
+using std::negation_v;
+using std::is_constructible_v;
+using std::is_copy_constructible_v;
+using std::is_same_v;
+
+#endif // ASUKACXX17
+
+#ifndef ASUKACXX14
+template <bool b, typename T, typename F>
+using conditional_t = typename std::conditional<b, T, F>::type;
+#else
+using std::conditional_t;
+#endif // ASUKACXX14
+
+} // namespace Asuka
 
 #endif // ASUKA_TYPE_TRAITS_HPP

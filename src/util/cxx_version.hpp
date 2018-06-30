@@ -15,6 +15,10 @@ static_assert(__cplusplus >= 201103L, "at least c++11");
 #  define ASUKACXX14 1
 #endif // __cplusplus >= 201402L
 
+#if __cplusplus >= 201703L
+#   define ASUKACXX17 1
+#endif // __cplusplus >= 201703L
+
 // CXXVER11 must be defined
 #ifdef ASUKACXX11
 #  define CONSTEXPR11   constexpr
