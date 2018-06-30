@@ -25,10 +25,12 @@ Connector::Connector(EventLoop* loop, const IpPort& servaddr)
       mRetryMs(kInitRetryMs),
       mChannel(nullptr)
 {
+    LOG_DEBUG << "ctor[" << this << "]";
 }
 
 Connector::~Connector()
 {
+    LOG_DEBUG << "dtor[" << this << "]";
     assert(!mChannel);
 }
 
@@ -48,7 +50,7 @@ void Connector::stop()
 {
     mIsConnect = false;
     // ??? FIXME unsafe
-    mLoop->run_in_loop(std::bind(&Connector::stop_in_loop, this));
+    mLoop->queue_in_loop(std::bind(&Connector::stop_in_loop, this));
     // ??? FIXME cancel timer
 }
 
@@ -91,6 +93,8 @@ void Connector::stop_in_loop()
     if (mStatus == kIsConnecting)
     {
         set_status(kDisConnected);
+        // !!!
+        LOG_DEBUG << "connector remove_and_reset_channel";
         int sockfd = remove_and_reset_channel();
         retry(sockfd);
     }
@@ -175,7 +179,7 @@ void Connector::handle_write()
             }
             else
             {
-                LOG_DEBUG << "isConnect is not true";
+                LOG_DEBUG << "is_connect is not true";
                 close_sockfd(sockfd);
             }
         }
@@ -219,6 +223,7 @@ void Connector::retry(int sockfd)
 
 int Connector::remove_and_reset_channel()
 {
+    LOG_DEBUG << "disable_all and remove";
     mChannel->disable_all();
     mChannel->remove();
     int sockfd = mChannel->get_fd();

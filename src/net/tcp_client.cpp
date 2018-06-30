@@ -12,6 +12,21 @@ namespace Net
 {
 
 
+namespace 
+{
+
+void gremove_connection(EventLoop* loop, const TcpConnectionPtr& conn)
+{
+    loop->queue_in_loop(std::bind(&TcpConnection::connect_destroy, conn));
+}
+
+void gremove_connector(const ConnectorPtr& connector)
+{
+    
+}
+
+} // unnamed namespace
+
 TcpClient::TcpClient(EventLoop* loop, const IpPort& serverAddr, std::string name)
     : mLoop(check_not_nullptr(loop)), 
       mConnector(new Connector{loop, serverAddr}),
@@ -33,14 +48,48 @@ TcpClient::~TcpClient()
 {
     LOG_INFO << "TcpClient::~TcpClient[" << mName
         << "] - connector " << mConnector.get();
-    // TODO
+    TcpConnectionPtr conn;
+    bool isUnique = false;
+
+    {
+        std::lock_guard<std::mutex> lock{ mMutex };
+        // !!!
+        LOG_DEBUG << "use_count: " << mConnection.use_count();
+        isUnique = mConnection.use_count() == 1;
+        conn = mConnection;
+    }
+
+    if (conn)
+    {
+        assert(mLoop == conn->get_loop());
+        CloseCallback cb = std::bind(gremove_connection, mLoop, 
+            std::placeholders::_1);
+        mLoop->run_in_loop(
+            std::bind(&TcpConnection::set_close_callback, conn, cb));
+
+        // !!!
+        LOG_DEBUG << "conn";
+        if (isUnique)
+        {
+            // !!!
+            LOG_DEBUG << "conn->force_close";
+            conn->force_close();
+        }
+    }
+    else
+    {
+        // !!!
+        LOG_DEBUG << "connector->stop";
+        mConnector->stop();
+        mLoop->run_after(1, std::bind(gremove_connector, mConnector));
+    }
 }
 
 void TcpClient::connect()
 {
     if (!mIsConnect)
     {
-        LOG_INFO << "TcpClient::connect[" << mName << "] - connect to"
+        LOG_INFO << "TcpClient::connect[" << mName << "] - connect to "
             << mConnector->get_server_address().get_ipport();
         mIsConnect = true;
         mConnector->start();
@@ -49,13 +98,15 @@ void TcpClient::connect()
 
 void TcpClient::disconnect()
 {
+    
     if (mIsConnect)
     {
         mIsConnect = false;
-
         std::lock_guard<std::mutex> lock{ mMutex };
         if (mConnection)
         {
+            // !!!
+            LOG_DEBUG << "conn shutdown";
             mConnection->shutdown();
         }
     }
@@ -63,16 +114,14 @@ void TcpClient::disconnect()
 
 void TcpClient::stop()
 {
-    if (!mIsConnect)
-    {
-        mIsConnect = false;
-        mConnector->stop();
-    }
+    mIsConnect = false;
+    mConnector->stop();
 }
 
 TcpConnectionPtr TcpClient::get_connection() const
 {
-    return TcpConnectionPtr();
+    std::lock_guard<std::mutex> lock{ mMutex };
+    return mConnection;
 }
 
 const EventLoop* TcpClient::get_loop() const
@@ -139,6 +188,8 @@ void TcpClient::new_connection(int sockfd)
 
 void TcpClient::remove_connection(const TcpConnectionPtr& conn)
 {
+    // !!!
+    LOG_DEBUG << " ";
     mLoop->assert_in_loop_thread();
     assert(mLoop == conn->get_loop());
 

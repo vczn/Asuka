@@ -8,6 +8,7 @@
 #include <utility>
 
 #include "endian.hpp"
+#include "../util/logger.hpp"
 
 namespace Asuka
 {
@@ -311,7 +312,7 @@ ssize_t Buffer::read_fd(int fd, int& savedError)
     }
     else
     {
-        mWriterIndex += mBuffer.size();
+        mWriterIndex = mBuffer.size();
         append(extrabuf, n - writable);
     }
 

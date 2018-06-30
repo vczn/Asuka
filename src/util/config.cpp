@@ -15,10 +15,10 @@ const char* Config::kConfigFile = "./Asuka.conf";
 const std::array<Any, Config::kNumberConfig> Config::kDefaultConfig
 {
 {
-    Any{ static_cast<short>(8888) },
-    Any{ 0 },
-    Any{ false },
-    Any{ std::string{""} }
+    Any{ static_cast<std::uint16_t>(8888) },    // port
+    Any{ 0 },                                   // number of thread[s]
+    Any{ false },                               // use epoll
+    Any{ std::string{""} }                      // path of logging file
 }
 };
 
@@ -59,7 +59,6 @@ Config::Config()
     {
         load_config(fin);
     }
-
 }
 
 

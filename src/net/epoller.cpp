@@ -115,6 +115,7 @@ void Epoller::update_channel(Channel& channel)
         if (channel.is_none_event())
         {
             // DEL
+            channel.set_index(kDeleted);
             update(EPOLL_CTL_DEL, channel);
         }
         else
@@ -135,8 +136,8 @@ void Epoller::remove_channel(Channel& channel)
     assert(mChannels.at(fd) == &channel);
     assert(channel.is_none_event());
 
-    std::size_t idx = channel.get_index();
-    assert(idx = kAdded || idx == kDeleted);
+    int idx = channel.get_index();
+    assert(idx == kAdded || idx == kDeleted);
     std::size_t n = mChannels.erase(fd);
     assert(n == 1);
     (void)n;

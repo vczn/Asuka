@@ -144,7 +144,7 @@ IpPort::IpPort(const char* ip, std::uint16_t port, bool ipv6)
     else
     {
         ::bzero(&mSockAddr.in4, sizeof(mSockAddr.in4));
-        to_ipport(ip, port, &mSockAddr.in6);
+        to_ipport(ip, port, &mSockAddr.in4);
     }
 }
 

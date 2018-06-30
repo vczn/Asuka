@@ -44,7 +44,7 @@ TcpConnection::TcpConnection(EventLoop* loop,
     : mLoop(loop), 
       mName(std::move(name)),
       mStatus(kIsConnecting),
-      mIsReading(false),
+      mIsReading(true),
       mSocket(new Socket{sockfd}),
       mChannel(new Channel{mLoop, sockfd}),
       mLocalAddr(localAddr),
@@ -162,17 +162,16 @@ void TcpConnection::shutdown()
     // FIXME: use compare and swap
     if (mStatus == kConnected)
     {
-        set_status(kDisConnected);
+        set_status(kIsDisConnecting);
         mLoop->run_in_loop(
-            std::bind(&TcpConnection::shutdown_in_loop, 
-            shared_from_this()));
+            std::bind(&TcpConnection::shutdown_in_loop, this));
     }
 }
 
 void TcpConnection::force_close()
 {
     // FIXME: use compare and swap
-    if (mStatus == kConnected || mStatus == kDisConnected)
+    if (mStatus == kConnected || mStatus == kIsDisConnecting)
     {
         set_status(kIsDisConnecting);
         mLoop->queue_in_loop(
@@ -183,7 +182,7 @@ void TcpConnection::force_close()
 
 void TcpConnection::force_close_with_delay(double seconds)
 {
-    if (mStatus == kConnected || mStatus == kDisConnected)
+    if (mStatus == kConnected || mStatus == kIsDisConnecting)
     {
         set_status(kIsDisConnecting);
         mLoop->run_after(
@@ -265,6 +264,8 @@ Buffer& TcpConnection::get_output_buffer()
 
 void TcpConnection::connect_established()
 {
+    // !!!
+    LOG_DEBUG << " ";
     mLoop->assert_in_loop_thread();
     assert(mStatus == kIsConnecting);
     set_status(kConnected);
@@ -276,13 +277,15 @@ void TcpConnection::connect_established()
 
 void TcpConnection::connect_destroy()
 {
+    // !!!
+    LOG_DEBUG << " ";
     mLoop->assert_in_loop_thread();
     if (mStatus == kConnected)
     {
         set_status(kDisConnected);
         mChannel->disable_all();
 
-        mConnectionCallback(shared_from_this());    // ???
+        mConnectionCallback(shared_from_this());
     }
     mChannel->remove();
 }
@@ -315,7 +318,6 @@ void TcpConnection::handle_write()
     {
         std::size_t n = ::write(mChannel->get_fd(),
             mOutputBuffer.read_begin(), mOutputBuffer.readable_bytes());
-        
         if (n > 0)
         {
             mOutputBuffer.retrieve(n);
@@ -328,7 +330,7 @@ void TcpConnection::handle_write()
                         mWriteCompleteCallback, shared_from_this()));
                 }
 
-                if (mStatus == kDisConnected)
+                if (mStatus == kIsDisConnecting)
                 {
                     shutdown_in_loop();
                 }   
@@ -351,10 +353,14 @@ void TcpConnection::handle_close()
     mLoop->assert_in_loop_thread();
     LOG_TRACE << "fd = " << mChannel->get_fd() 
         << " status = " << status_to_string();
-    assert(mStatus == kConnected || mStatus == kDisConnected);
+    assert(mStatus == kConnected || mStatus == kIsDisConnecting);
     set_status(kDisConnected);
     mChannel->disable_all();
     
+    TcpConnectionPtr guardThis(shared_from_this());
+    mConnectionCallback(guardThis);
+
+    mCloseCallback(guardThis);
 }
 
 void TcpConnection::handle_error()
@@ -393,14 +399,14 @@ void TcpConnection::send_in_loop(const void* data, std::size_t len)
                     faultError = true;
                 }
             }
-            else  // nwrote >= 0
+        }
+        else  // nwrote >= 0
+        {
+            remaining = len - static_cast<std::size_t>(nwrote);
+            if (remaining == 0 && mWriteCompleteCallback)
             {
-                remaining = len - static_cast<std::size_t>(nwrote);
-                if (remaining == 0 && mWriteCompleteCallback)
-                {
-                    mLoop->queue_in_loop(std::bind(mWriteCompleteCallback, 
-                        shared_from_this()));
-                }
+                mLoop->queue_in_loop(std::bind(mWriteCompleteCallback,
+                    shared_from_this()));
             }
         }
     }

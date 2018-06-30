@@ -31,6 +31,7 @@ Channel::Channel(EventLoop* loop, int fd)
 
 Channel::~Channel()
 {
+    LOG_DEBUG << " "<< get_fd();
     assert(!mIsAddedInLoop);
     assert(!mIsEventHanding);
     if (mLoop->is_in_loop_thread())
@@ -179,6 +180,8 @@ void Channel::set_not_loghup()
 void Channel::remove()
 {
     assert(is_none_event());
+    // !!!
+    LOG_DEBUG << " " << get_fd();
     mIsAddedInLoop = false;
     mLoop->remove_channel(*this);
 }
@@ -208,6 +211,8 @@ std::string Channel::static_events_to_string(int fd, int events)
 }
 void Channel::update()
 {
+    // !!!
+    LOG_DEBUG << " " << get_fd();
     mIsAddedInLoop = true;
     mLoop->update_channel(*this);
 }
