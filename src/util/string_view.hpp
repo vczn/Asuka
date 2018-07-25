@@ -1,10 +1,11 @@
-// Part of Asuka utility, internal header
+﻿// Part of Asuka utility, internal header
 // Copyleft 2018, vczn
 
 #pragma once
 #ifndef ASUKA_STRING_VIEW_HPP
 #define ASUKA_STRING_VIEW_HPP
 
+#include <algorithm>
 #include <cassert>
 #include <cstdint>
 #include <cstring>
@@ -16,73 +17,321 @@
 namespace Asuka
 {
 
-// make wheel with c++11/14
-// don't use std::string_view in c++17
-// not template
-
-
-CONSTEXPR14 std::size_t get_length(const char* str)
+template <typename CharT>
+struct StringViewIterator
 {
-    std::size_t len{};
-    while (*str != '\0')
+    using iterator_category = std::random_access_iterator_tag;
+    using value_type        = CharT;
+    using pointer           = const CharT*;
+    using reference         = const CharT&;
+    using difference_type   = std::ptrdiff_t;
+    using Self              = StringViewIterator<CharT>;
+
+
+#ifndef NDEBUG
+    constexpr StringViewIterator() noexcept
+        : ptr(nullptr), size(0), index(0) 
     {
-        ++str;
-        ++len;
     }
-    return len;
+
+    constexpr StringViewIterator(const pointer p, const size_t s, const size_t idx) noexcept
+        : ptr(p), size(s), index(idx)
+    {
+    }
+
+    constexpr reference operator*() const noexcept
+    {
+        assert(ptr != nullptr);
+        assert(index < size);
+        return ptr[index];
+    }
+
+    constexpr pointer operator->() const noexcept
+    {
+        assert(ptr != nullptr);
+        assert(index < size);
+        return ptr;
+    }
+
+    constexpr Self& operator++() noexcept  // pre
+    {
+        assert(ptr != nullptr);
+        assert(index < size);
+        ++index;
+        return *this;
+    }
+
+    constexpr Self operator++(int) noexcept // post
+    {
+        Self tmp{ *this };
+        ++*this;
+        return tmp;
+    }
+
+    constexpr Self& operator--() noexcept // pre
+    {
+        assert(ptr != nullptr);
+        assert(index != 0);
+        --index;
+        return *this;
+    }
+
+    constexpr Self operator--(int) noexcept // post
+    {
+        Self tmp{ *this };
+        --*this;
+        return tmp;
+    }
+
+    constexpr Self& operator+=(const difference_type off) noexcept
+    {
+        assert(ptr != nullptr);
+        if (off < 0)
+        {
+            assert(index >= static_cast<size_t>(-off));
+        }
+        else if (off > 0)
+        {
+            assert(index + off <= size);
+        }
+
+        index += off;
+        return *this;
+    }
+
+    constexpr Self operator+(const difference_type off) const noexcept
+    {
+        Self tmp{ *this };
+        tmp += off;
+        return tmp;
+    }
+
+    constexpr Self operator-=(const difference_type off) noexcept
+    {
+        assert(ptr != nullptr);
+        if (off > 0)
+        {
+            assert(index >= static_cast<size_t>(off));
+        }
+        else if (off < 0)
+        {
+            assert(index + static_cast<size_t>(-off) <= size);
+        }
+
+        index -= off;
+        return *this;
+    }
+
+    constexpr Self operator-(const difference_type off) const noexcept
+    {
+        Self tmp{ *this };
+        tmp -= off;
+        return tmp;
+    }
+
+    constexpr difference_type operator-(const Self& rhs) const noexcept
+    {
+        assert(ptr == rhs.ptr && size == rhs.size);
+        return index - rhs.index;
+    }
+
+    constexpr reference operator[](const difference_type off) const noexcept
+    {
+        return *(*this + off);
+    }
+
+    constexpr bool operator==(const Self& rhs) const noexcept
+    {
+        assert(ptr == rhs.ptr && size == rhs.size);
+        return index == rhs.index;
+    }
+
+    constexpr bool operator<(const Self& rhs) const noexcept
+    {
+        assert(ptr == rhs.ptr && size == rhs.size);
+        return index < rhs.index;
+    }
+
+    pointer ptr;
+    size_t size;
+    size_t index;
+
+#else 
+    constexpr StringViewIterator() : ptr(nullptr) {}
+    constexpr StringViewIterator(const CharT* p) : ptr(p) {}
+
+    constexpr reference operator*() const noexcept
+    {
+        return *ptr;
+    }
+
+    constexpr pointer operator->() const noexcept
+    {
+        return std::pointer_traits<pointer>::pointer_to(**this);
+    }
+
+    constexpr Self& operator++() noexcept
+    {
+        ++ptr;
+        return *this;
+    }
+
+    constexpr Self operator++(int) const noexcept
+    {
+        Self tmp{ *this };
+        ++*this;
+        return tmp;
+    }
+
+    constexpr Self& operator--() noexcept
+    {
+        --ptr;
+        return *this;
+    }
+
+    constexpr Self operator--(int) const noexcept
+    {
+        Self tmp{ *this };
+        --*this;
+        return tmp;
+    }
+
+    constexpr Self& operator+=(const difference_type off) noexcept
+    {
+        ptr += off;
+        return *this;
+    }
+
+    constexpr Self operator+(const difference_type off) const noexcept
+    {
+        Self tmp{ *this };
+        tmp += off;
+        return tmp;
+    }
+
+    constexpr Self& operator-=(const difference_type off) noexcept
+    {
+        ptr -= off;
+        return *this;
+    }
+
+    constexpr Self operator-(const difference_type off) const noexcept
+    {
+        Self tmp{ *this };
+        tmp -= off;
+        return tmp;
+    }
+
+    constexpr difference_type operator-(const Self& rhs) const noexcept
+    {
+        return ptr - rhs.ptr;
+    }
+
+    constexpr reference operator[](const difference_type off) const noexcept
+    {
+        return *(*this + off);
+    }
+
+    constexpr bool operator==(const Self& rhs) const noexcept
+    {
+        return ptr == rhs.ptr;
+    }
+
+    constexpr bool operator<(const Self& rhs) const noexcept
+    {
+        return ptr < rhs.ptr;
+    }
+
+    pointer ptr;
+#endif // NDEBUG
+
+    constexpr bool operator!=(const Self& rhs) const noexcept
+    {
+        return !(*this == rhs);
+    }
+
+    constexpr bool operator>(const Self& rhs) const noexcept
+    {
+        return rhs < *this;
+    }
+
+    constexpr bool operator<=(const Self& rhs) const noexcept
+    {
+        return !(rhs < *this);
+    }
+
+    constexpr bool operator>=(const Self& rhs) const noexcept
+    {
+        return !(*this < rhs);
+    }
+};
+
+template <typename CharT>
+constexpr StringViewIterator<CharT> operator+(
+    const typename StringViewIterator<CharT>::difference_type off,
+    StringViewIterator<CharT> rhs) noexcept
+{
+    rhs += off;
+    return rhs;
 }
 
-// A constant contiguous sequence of `char`
-// StringView is far more effective
-// for constant contiguous sequence than std::string
-class StringView
+template <typename CharT, 
+    typename Traits = std::char_traits<CharT>>
+class BasicStringView
 {
 public:
-    using value_type        = char;
-    using size_type         = std::size_t;
-    using difference_type   = std::ptrdiff_t;
-    using pointer           = char*;
-    using const_pointer     = const char*;
-    using reference         = char&;
-    using const_reference   = const char&;
-    using const_iterator    = const char*;
+    using value_type                = CharT;
+    using traits_type               = Traits;
+    using pointer                   = CharT*;
+    using const_pointer             = const CharT*;
+    using reference                 = CharT&;
+    using const_reference           = const CharT&;
+    using const_iterator            = StringViewIterator<CharT>;
+    using iterator                  = const_iterator;
+    using const_reverse_iterator    = std::reverse_iterator<const_iterator>;
+    using reverse_iterator          = std::reverse_iterator<iterator>;
+    using size_type                 = std::size_t;
+    using difference_type           = std::ptrdiff_t;
 
 public:
-    static constexpr auto npos = static_cast<size_type>(-1);
+    static constexpr size_type npos = static_cast<size_type>(-1);
 
-public:
-    constexpr StringView() noexcept
-        : mData(), 
-          mSize(0)
+    constexpr BasicStringView() noexcept
+        : mData(nullptr), mSize(0)
     {
     }
 
-    constexpr StringView(const StringView& rhs) noexcept = default;
-    constexpr StringView& operator=(const StringView& rhs) noexcept = default;
+    constexpr BasicStringView(const BasicStringView& rhs) noexcept = default;
 
-    StringView(const std::string& str)  // extend
+    constexpr BasicStringView(const CharT* s, size_type count)
+        : mData(s), mSize(count)
+    {
+    }
+
+    constexpr BasicStringView& operator=(const BasicStringView& rhs) noexcept = default;
+
+    // use constexpr version instead of char_traits::length
+    // std::char_traits constexpr length need C++17
+    // C++14 should be able to implement it
+    // TODO char_traits
+    CONSTEXPR14 BasicStringView(const CharT* s)
+        : mData(s), mSize(get_string_length(s))    
+    {
+    }
+
+    BasicStringView(const std::basic_string<CharT>& str)
         : mData(str.data()),
           mSize(str.size())
     {
     }
 
-    constexpr StringView(const_pointer str, size_type len)
-        : mData(str),
-          mSize(len)
-    {
-    }
-
-    CONSTEXPR14 StringView(const_pointer str)
-        : mData(str),
-          mSize(get_length(str))
-    {
-        assert(mSize != 0);
-        assert(str != nullptr);
-    }
-
     constexpr const_iterator begin() const noexcept
     {
-        return mData;
+#ifndef NDEBUG
+        return const_iterator{ mData, mSize, 0 };
+#else 
+        return const_iterator{ mData };
+#endif  // NDEBUG
     }
 
     constexpr const_iterator cbegin() const noexcept
@@ -92,12 +341,36 @@ public:
 
     constexpr const_iterator end() const noexcept
     {
-        return mData + mSize;
+#ifndef NDEBUG
+        return const_iterator{ mData, mSize, mSize };
+#else 
+        return const_iterator{ mData + mSize };
+#endif  // _DEBUG
     }
 
     constexpr const_iterator cend() const noexcept
     {
         return end();
+    }
+
+    constexpr const_reverse_iterator rbegin() const noexcept
+    {
+        return const_reverse_iterator{ end() };
+    }
+
+    constexpr const_reverse_iterator crbegin() const noexcept
+    {
+        return rbegin();
+    }
+
+    constexpr const_reverse_iterator rend() const noexcept
+    {
+        return const_reverse_iterator{ begin() };
+    }
+
+    constexpr const_reverse_iterator crend() const noexcept
+    {
+        return rend();
     }
 
     CONSTEXPR14 const_reference operator[](size_type pos) const
@@ -108,34 +381,24 @@ public:
 
     CONSTEXPR14 const_reference at(size_type pos) const
     {
-        check_offset(pos);
+        check_postion_eq(pos);
 
         return mData[pos];
     }
 
     constexpr const_reference front() const
     {
-        return this->operator[](0);
+        return operator[](0);
     }
 
     constexpr const_reference back() const
     {
-        return this->operator[](mSize - 1);
+        return operator[](mSize - 1);
     }
 
     constexpr const_pointer data() const noexcept
     {
         return mData;
-    }
-
-    constexpr size_type max_size() const noexcept
-    {
-        return npos;
-    }
-
-    constexpr bool empty() const noexcept
-    {
-        return mSize == 0;
     }
 
     constexpr size_type size() const noexcept
@@ -148,223 +411,362 @@ public:
         return mSize;
     }
 
-    CONSTEXPR14 void remove_prefix(const size_type count) noexcept
+    constexpr size_type max_size() const noexcept
     {
-        assert(count < size());
-        mData += count;
-        mSize -= count;
+        return static_cast<size_type>(-1) / sizeof(CharT);
     }
 
-    CONSTEXPR14 void remove_suffix(const size_type count) noexcept
+    constexpr bool empty() const noexcept
     {
-        assert(count < size());
-        mSize -= count;
+        return mSize == 0;
     }
 
-    CONSTEXPR14 void swap(StringView& rhs) noexcept
+    CONSTEXPR14 void remove_prefix(size_type n)
     {
-        // std::swap isn't constexpr
-        StringView tmp{ rhs };
-        rhs = *this;
-        *this = tmp;
+        assert(n <= mSize);
+        mData += n;
+        mSize -= n;
     }
-    
-    CONSTEXPR14 StringView substr(size_type pos = 0, 
-        size_type count = npos) const
-    {
-        check_offset(pos);
-        count = std::min(count, size() - pos);
 
-        return StringView{ mData + pos, count };
+    CONSTEXPR14 void remove_suffix(size_type n)
+    {
+        assert(n < mSize);
+        mSize -= n;
     }
-    
-    size_type copy(char* dest, size_type count, 
-        size_type pos = 0) const
-    {
-        assert(pos < size());
-        count = std::min(count, size() - pos);
-        std::memcpy(dest, mData + pos, count);
 
+    CONSTEXPR14 void swap(BasicStringView& rhs) noexcept
+    {
+        if (this != &rhs)
+        {
+            BasicStringView tmp{ rhs };
+            rhs = *this;
+            *this = tmp;
+        }
+    }
+
+    size_type copy(CharT* dst, size_type count, size_type pos = 0) const
+    {
+        check_position(pos);
+        count = std::min(count, mSize - pos);
+        Traits::copy(dst, mData + pos, count);
         return count;
     }
 
-    // parameter is StringView in c++ standard
-
-    CONSTEXPR14 int compare(const StringView& rhs) const noexcept
+    CONSTEXPR14 BasicStringView substr(size_type pos = 0, 
+        size_type count = npos) const
     {
-        size_type minSize = std::min(mSize, rhs.size());
-        int rc = std::memcmp(mData, rhs.mData, minSize);
-        if (rc == 0)
-        {
-            if (mSize < rhs.mSize)
-            {
-                rc = -1;
-            }
-            else if (mSize > rhs.mSize)
-            {
-                rc = 1;
-            }
-        }
-
-        return rc;
+        check_position(pos);
+        count = std::min(count, mSize - pos);
+        return BasicStringView{ mData + pos, count };
     }
 
-    CONSTEXPR14 int compare(size_type pos1, size_type count1,
-        const StringView& rhs) const 
+    CONSTEXPR14 int compare(BasicStringView rhs) const noexcept
+    {
+        return compare(mData, mSize, rhs.mData, rhs.mSize);
+    }
+
+    CONSTEXPR14 int compare(size_type pos1, size_type count1, 
+        BasicStringView rhs) const
     {
         return substr(pos1, count1).compare(rhs);
     }
 
-    CONSTEXPR14 int compare(size_type pos1, size_type count1,
-        const StringView& rhs, size_type pos2, size_type count2) const
+    CONSTEXPR14 int compare(size_type pos1, size_type count1, 
+        BasicStringView rhs, size_type pos2, size_type count2) const
     {
         return substr(pos1, count1).compare(rhs.substr(pos2, count2));
     }
 
-    CONSTEXPR14 int compare(const char* str) const
+    CONSTEXPR14 int compare(const CharT* str) const
     {
-        return compare(StringView{ str });
+        return compare(BasicStringView{ str });
     }
 
     CONSTEXPR14 int compare(size_type pos1, size_type count1,
-        const char* str) const
+        const CharT* str) const
     {
-        return substr(pos1, count1).compare(StringView{ str });
+        return substr(pos1, count1).compare(str);
     }
 
-    constexpr int compare(size_type pos1, size_type count1,
-        const char* str, size_type count2) const 
+    CONSTEXPR14 int compare(size_type pos1, size_type count1,
+        const CharT* str, size_type count2) const
     {
-        return substr(pos1, count1).compare(StringView{ str, count2 });
+        return substr(pos1, count1).compare(BasicStringView{ str, count2 });
     }
 
-    constexpr bool starts_with(const StringView& x) const noexcept
+    CONSTEXPR14 bool starts_with(BasicStringView rhs) const noexcept
     {
-        return size() >= x.size() && compare(0, x.size(), x) == 0;
+        return mSize >= rhs.mSize && compare(0, rhs.mSize, rhs) == 0;
     }
 
-    constexpr bool starts_with(char x) const noexcept
+    CONSTEXPR14 bool starts_with(CharT ch) const noexcept
     {
-        return starts_with(StringView{ &x, 1 });
+        return starts_with(BasicStringView{ &ch, 1 });
     }
 
-    CONSTEXPR14 bool starts_with(const char* x) const
+    CONSTEXPR14 bool starts_with(const CharT* str) const noexcept
     {
-        return starts_with(StringView{ x });
+        return starts_with(BasicStringView{ str });
     }
 
-    constexpr bool ends_with(const StringView& x) const noexcept
+    CONSTEXPR14 bool ends_with(BasicStringView rhs) const noexcept
     {
-        return size() >= x.size() && 
-            compare(size() - x.size(), x.size(), x) == 0;
+        return mSize >= rhs.mSize &&
+            compare(mSize - rhs.mSize, rhs.mSize, rhs) == 0;
     }
 
-    constexpr bool ends_with(char x) const noexcept
+    CONSTEXPR14 bool ends_with(CharT ch) const noexcept
     {
-        return ends_with(StringView{ &x, 1 });
+        return ends_with(BasicStringView{ &ch, 1 });
     }
 
-    constexpr bool ends_with(const char* x) const
+    CONSTEXPR14 bool ends_with(const CharT* str) const noexcept
     {
-        return ends_with(StringView{ x });
+        return ends_with(BasicStringView{ str });
     }
 
-    CONSTEXPR14 size_type find(const StringView& sv, 
-        size_type pos1 = 0) const noexcept
+    CONSTEXPR14 size_type find(BasicStringView rhs, size_type pos1 = 0) const noexcept
     {
-        if (mSize < sv.mSize || pos1 + sv.mSize > mSize)
+        if (mSize < rhs.mSize || pos1 + rhs.mSize > mSize)
         {
             return npos;
         }
 
-        for (size_type i = pos1; i <= size() - sv.size(); ++i)
+        if (rhs.empty())    // always matches
         {
-            if (mData[i] == sv[0])  // matched the first character
+            return std::min(pos1, mSize);
+        }
+
+        for (size_type i = pos1; i <= mSize - rhs.mSize; ++i)
+        {
+            if (mData[i] == rhs[0])     // matched the first element
             {
                 size_type j = 1;
-                for (; j < sv.size(); ++j)
+                for (j = 1; j < rhs.mSize; ++j)
                 {
-                    if (mData[i + j] != sv[j]) // mismatched
+                    if (mData[i + j] != rhs[j]) // mismatched
                     {
                         break;
                     }
                 }
-                if (j == sv.size())  // matched all characters
+
+                if (j == rhs.mSize)
+                {
+                    return i;   // matched
+                }
+            }
+        }
+
+        return npos;
+    }
+
+    CONSTEXPR14 size_type find(CharT ch, size_type pos1 = 0) const noexcept
+    {
+        for (size_type i = pos1; i < mSize; ++i)
+        {
+            if (mData[i] == ch)
+            {
+                return i;   // matched
+            }
+        }
+
+        return npos;
+    }
+
+    CONSTEXPR14 size_type find(const CharT* str, size_type pos1, 
+        size_type count2) const noexcept
+    {
+        return find(BasicStringView{ str, count2 }, pos1);
+    }
+
+    CONSTEXPR14 size_type find(const CharT* str, size_type pos1) const noexcept
+    {
+        return find(BasicStringView{ str }, pos1);
+    }
+
+    CONSTEXPR14 size_type rfind(BasicStringView rhs, 
+        size_type pos1 = npos) const noexcept
+    {
+        if (rhs.mSize == 0)     // always matches
+        {
+            return std::min(pos1, mSize);
+        }
+
+        if (rhs.mSize > mSize)
+        {
+            return npos;
+        }
+
+        for (size_type i = std::min(pos1, mSize - rhs.mSize); i >= 0; --i)
+        {
+            if (mData[i] == rhs[0])     // matched the first element
+            {
+                size_type j = 1;
+                for (j = 1; j < rhs.mSize; ++j)
+                {
+                    if (mData[i + j] != rhs[j])
+                    {
+                        break;
+                    }
+                }
+
+                if (j == rhs.mSize)
                 {
                     return i;
                 }
             }
         }
-        
+
         return npos;
     }
 
-    CONSTEXPR14 size_type find(char ch, size_type pos1 = 0) const noexcept
+    CONSTEXPR14 size_type rfind(CharT ch, size_type pos1 = npos) const noexcept
     {
-        return find(StringView{ &ch, 1 }, pos1);
+        if (mSize == 0)
+        {
+            return npos;
+        }
+
+        for (size_type i = std::min(pos1, mSize - 1); i >= 0; --i)
+        {
+            if (mData[i] == ch)
+            {
+                return i;   // matched
+            }
+        }
+
+        return npos;
     }
 
-    CONSTEXPR14 size_type find(const char* str, 
-        size_type pos1, size_type count2) const noexcept
+    CONSTEXPR14 size_type rfind(const CharT* str, size_type pos1, 
+        size_type count2) const
     {
-        return find(StringView{ str, count2 }, pos1);
+        return rfind(BasicStringView{ str, count2 }, pos1);
     }
 
-    CONSTEXPR14 size_type find(const char* str, size_type pos1 = 0) const
+    CONSTEXPR14 size_type rfind(const CharT* str, size_type pos1 = npos) const
     {
-        return find(StringView{ str }, pos1);
+        return rfind(BasicStringView{ str }, pos1);
     }
 
-    std::string to_string() const
+    std::string to_string() const 
     {
         return std::string{ mData, mSize };
     }
 
 private:
-    CONSTEXPR14 void check_offset(const size_type offset) const
+    static CONSTEXPR14 size_type get_string_length(const_pointer str) noexcept
     {
-        if (mSize < offset)
+        size_type len = Traits::length(str);
+        return len;
+    }
+
+    static CONSTEXPR14 int compare(const_pointer lhs, const size_type lsize,
+        const_pointer rhs, const size_type rsize) noexcept
+    {
+        const int ans = Traits::compare(lhs, rhs, std::min(lsize, rsize));
+        if (ans != 0)
         {
-            throw std::out_of_range{ "out of range" };
+            return ans;
+        }
+
+        if (lsize < rsize)
+        {
+            return -1;
+        }
+
+        if (lsize > rsize)
+        {
+            return 1;
+        }
+
+        return 0;
+    }
+
+    constexpr void check_position(const size_type pos) const
+    {
+        if (pos > mSize)
+        {
+            Xrange();
         }
     }
 
-private:
-    const char* mData;
+    constexpr void check_postion_eq(const size_type pos) const
+    {
+        if (pos >= mSize)
+        {
+            Xrange();
+        }
+    }
+
+    static void Xrange()
+    {
+        throw std::out_of_range("invalid string_base_view<CharT> out of range");
+    }
+
+    const_pointer mData;
     size_type mSize;
 };
 
-CONSTEXPR14 bool operator==(const StringView& lhs, const StringView& rhs) noexcept
+template <typename CharT, typename Traits>
+constexpr bool operator==(BasicStringView<CharT, Traits> lhs,
+    BasicStringView<CharT> rhs) noexcept
 {
-    return lhs.compare(rhs) == 0;
+    return lhs.size() == rhs.size() &&
+        std::equal(lhs.begin(), lhs.end(), rhs.begin());
 }
 
-CONSTEXPR14 bool operator!=(const StringView& lhs, const StringView& rhs) noexcept
+
+template <typename CharT, typename Traits>
+constexpr bool operator!=(BasicStringView<CharT, Traits> lhs,
+    BasicStringView<CharT> rhs) noexcept
 {
     return !(lhs == rhs);
 }
 
-CONSTEXPR14 bool operator<(const StringView& lhs, const StringView& rhs) noexcept
+template <typename CharT, typename Traits>
+constexpr bool operator<(BasicStringView<CharT, Traits> lhs,
+    BasicStringView<CharT> rhs) noexcept
 {
-    return lhs.compare(rhs) < 0;
+    return stdlexicographical_compare(lhs.begin(), lhs.end(), 
+        rhs.begin(), rhs.end());
 }
 
-CONSTEXPR14 bool operator<=(const StringView& lhs, const StringView& rhs) noexcept
-{
-    return !(rhs < lhs);
-}
-
-CONSTEXPR14 bool operator>(const StringView& lhs, const StringView& rhs) noexcept
+template <typename CharT, typename Traits>
+constexpr bool operator>(BasicStringView<CharT, Traits> lhs,
+    BasicStringView<CharT> rhs) noexcept
 {
     return rhs < lhs;
 }
 
-CONSTEXPR14 bool operator>=(const StringView& lhs, const StringView& rhs) noexcept
+template <typename CharT, typename Traits>
+constexpr bool operator<=(BasicStringView<CharT, Traits> lhs,
+    BasicStringView<CharT> rhs) noexcept
 {
-    return !(lhs < rhs);
+    return !(rhs < lhs);
 }
 
-} // namespace WebServer
+template <typename CharT, typename Traits>
+constexpr bool operator>=(BasicStringView<CharT, Traits> lhs,
+    BasicStringView<CharT> rhs) noexcept
+{
+    return !(lhs > rhs);
+}
 
+template <typename CharT, typename Traits>
+std::basic_ostream<CharT, Traits>& operator<<(
+    std::basic_ostream<CharT, Traits>& os,
+    BasicStringView<CharT, Traits> sv)
+{
+    os << sv.data();
+    return os;
+}
+
+using StringView    = BasicStringView<char>;
+using WStringView   = BasicStringView<wchar_t>;
+using U16StringView = BasicStringView<char16_t>;
+using U32StringView = BasicStringView<char32_t>;
+
+} // namespace Asuka
 
 #endif // ASUKA_STRING_VIEW_HPP

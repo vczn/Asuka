@@ -85,7 +85,7 @@ void test_config()
 
 void test_log()
 {
-#if 1
+#if 0
     LOG_TRACE << "abc" << 42 << 88.8;
     LOG_DEBUG << "abc" << 42 << 88.8;
     LOG_INFO << "abc" << 42 << 88.8;
@@ -99,7 +99,84 @@ void test_log()
 
 void test_string_view()
 {
+    StringView str0;
+    UNIT_TEST(true, str0.empty());
 
+    StringView str1 = "abcd";
+    UNIT_TEST(4, str1.size());
+    UNIT_TEST('a', *str1.begin());
+    UNIT_TEST('a', str1.front());
+    UNIT_TEST('d', str1.back());
+    UNIT_TEST('b', *(str1.begin() + 1));
+    UNIT_TEST('d', *(str1.end() - 1));
+    UNIT_TEST('b', *++str1.begin());
+    UNIT_TEST('d', *--str1.end());
+    UNIT_TEST('c', str1[2]);
+    UNIT_TEST('c', str1.at(2));
+    UNIT_TEST(false, str1.empty());
+
+#if 0
+    try
+    {
+        UNIT_TEST('\0', str1.at(4));
+    }
+    catch (std::out_of_range& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+
+    std::cout << str1 << std::endl;
+#endif // switch
+
+
+    StringView str2 = "12345";
+    str1.swap(str2);
+    UNIT_TEST(5, str1.size());
+    UNIT_TEST('1', str1.front());
+
+
+    StringView str3 = "   trim me    ";
+    str3.remove_prefix(3);
+    UNIT_TEST('t', str3.front());
+    str3.remove_suffix(4);
+    UNIT_TEST('e', str3.back());
+
+    char buf[32] = {};
+    std::size_t copyLen = str1.copy(buf, 3, 1);
+    UNIT_TEST(true, copyLen == 3);
+    UNIT_TEST('2', buf[0]);
+    UNIT_TEST('3', buf[1]);
+    UNIT_TEST('4', buf[2]);
+
+    memset(buf, 0, sizeof(buf));
+    copyLen = str1.copy(buf, 3, 3);
+    UNIT_TEST(2, copyLen);
+    UNIT_TEST('4', buf[0]);
+
+    StringView str4 = str1.substr(1, 4);
+    UNIT_TEST(4, str4.length());
+    UNIT_TEST('2', str4.front());
+    str4 = str1.substr(2, 4);
+    UNIT_TEST(3, str4.size());
+
+    StringView str5 = "xxxaaabcdefgxxxedf";
+    StringView str6 = "xxxaaabcd";
+    UNIT_TEST(true, str5.compare(str6) > 0);
+    UNIT_TEST(true, str5.compare(str5) == 0);
+    UNIT_TEST(true, str6.compare("xxxaaabcd") == 0);
+    UNIT_TEST(true, str5.compare(0, 9, str6, 0, 10) == 0);
+
+    UNIT_TEST(true, str5.starts_with("xxx"));
+    UNIT_TEST(true, str5.starts_with('x'));
+    UNIT_TEST(true, str5.starts_with(str6));
+    UNIT_TEST(true, str5.ends_with("xxedf"));
+    UNIT_TEST(true, str5.ends_with('f'));
+
+    UNIT_TEST(0, str5.find("xxx", 0));
+    UNIT_TEST(12, str5.find("xxx", 1));
+    UNIT_TEST(12, str5.rfind("xxx"));
+    UNIT_TEST(12, str5.rfind("xxx", 12));
+    UNIT_TEST(0, str5.rfind("xxx", 11));
 }
 
 void test_time_stamp()
