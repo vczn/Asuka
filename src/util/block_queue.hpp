@@ -1,6 +1,3 @@
-﻿// Part of Asuka utility, internal header
-// Copyleft 2018, vczn
-
 #pragma once
 #ifndef ASUKA_BLOCK_QUEUE_HPP
 #define ASUKA_BLOCK_QUEUE_HPP

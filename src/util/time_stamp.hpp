@@ -1,6 +1,3 @@
-﻿// Part of Asuka utility, internal header
-// Copyleft 2018, vczn
-
 #pragma once
 #ifndef ASUKA_TIME_STAMP_HPP
 #define ASUKA_TIME_STAMP_HPP

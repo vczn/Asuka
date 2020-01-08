@@ -1,10 +1,6 @@
-﻿// Part of Asuka utility, internal header
-// Copyleft 2018, vczn
-//
 
 // ------------------------------------------
-// complete it too hard for me in c++11/14,
-// so temporarily use the `boost` library
+// temporarily use the `boost` library
 // ------------------------------------------
 
 //#include <limits>

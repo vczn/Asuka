@@ -1,6 +1,3 @@
-﻿// Part of Asuka utility 
-// Copyleft 2018, vczn
-
 #pragma once
 #ifndef ASUKA_CXX_VERSION_HPP
 #define ASUKA_CXX_VERSION_HPP

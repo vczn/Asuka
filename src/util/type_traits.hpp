@@ -1,7 +1,3 @@
-﻿// Part of Asuka utility, internal header
-// Copyleft 2018, vczn
-
-// types helper header, implements some c++17 type traits
 #pragma once
 #ifndef ASUKA_TYPE_TRAITS_HPP
 #define ASUKA_TYPE_TRAITS_HPP

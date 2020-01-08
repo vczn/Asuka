@@ -1,15 +1,11 @@
-﻿// Part of Asuka net utility, internal header
-// Copyleft 2018, vczn
-
-#include <sys/epoll.h>
-
-#include <vector>
-
-#include "poller_base.hpp"
-
 #pragma once
 #ifndef ASUKA_EPOLLER_HPP
 #define ASUKA_EPOLLER_HPP
+
+#include <sys/epoll.h>
+#include <vector>
+
+#include "poller_base.hpp"
 
 namespace Asuka
 {

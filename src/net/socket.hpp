@@ -1,6 +1,3 @@
-﻿// Part of Asuka net utility, internal header
-// Copyleft 2018, vczn
-
 #pragma once
 #ifndef ASUKA_SOCKET_HPP
 #define ASUKA_SOCKET_HPP

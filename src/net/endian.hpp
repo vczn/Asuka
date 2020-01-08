@@ -1,6 +1,3 @@
-﻿// Part of Asuka utility, internal header
-// Copyleft 2018, vczn
-
 #pragma once
 #ifndef ASUKA_ENDIAN_HPP
 #define ASUKA_ENDIAN_HPP

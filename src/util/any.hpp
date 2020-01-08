@@ -1,7 +1,4 @@
-﻿// Part of Asuka utility, internal header
-// Copyleft 2018, vczn
-
-#pragma once
+﻿#pragma once
 #ifndef ASUKA_ANY_HPP
 #define ASUKA_ANY_HPP
 
@@ -13,10 +10,7 @@
 namespace Asuka
 {
 
-// make wheel with c++11/14
-// don't use std::any in c++17
 // reference the boost
-
 
 class BadAnyCast : public std::bad_cast
 {

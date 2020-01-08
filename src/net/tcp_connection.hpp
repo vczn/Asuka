@@ -1,6 +1,3 @@
-﻿// Part of Asuka net utility, public header
-// Copyleft 2018, vczn
-
 #pragma once
 #ifndef ASUKA_TCP_CONNECTION_HPP
 #define ASUKA_TCP_CONNECTION_HPP

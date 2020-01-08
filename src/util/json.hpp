@@ -1,7 +1,4 @@
-﻿// part of asuka utility, public header
-// copyleft 2018, vczn
-
-#pragma once
+﻿#pragma once
 #ifndef ASUKA_JSON_HPP
 #define ASUKA_JSON_HPP
 

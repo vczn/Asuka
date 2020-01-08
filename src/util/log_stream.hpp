@@ -1,6 +1,3 @@
-﻿// Part of Asuka utility, log internal header
-// Copyleft 2018, vczn
-
 #pragma once
 #ifndef ASUKA_LOG_STREAM
 #define ASUKA_LOG_STREAM

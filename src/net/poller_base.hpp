@@ -1,6 +1,3 @@
-﻿// Part of Asuka net utility, internal header
-// Copyleft 2018, vczn
-
 #pragma once
 #ifndef ASUKA_POLLER_BASE
 #define ASUKA_POLLER_BASE
